@@ -31,7 +31,7 @@ sleep 0.25
 echo -e "Checking if there are updates for the dependencies..."
 sleep 2
 
-#x-terminal-emulator -e /home/nilac8991/Desktop/dependencies.sh 
+x-terminal-emulator -e /home/nilac8991/Desktop/dependencies.sh 
 
 echo -e "Press any key to continue after the upgrade is completed"
 
