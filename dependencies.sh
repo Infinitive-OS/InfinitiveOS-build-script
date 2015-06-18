@@ -1,7 +1,6 @@
-sleep 2 
+#!/bin/bash
 
 echo "Installing Post-Dependencies for the build environment"
-sleep 1
 echo "This step is automatically skipped if there already installed"
 
 	echo "Insert your password:"
@@ -18,4 +17,4 @@ echo "****************************************"
 echo "Going back now to the main script widnow"
 echo "****************************************"
 
-sleep 2 
+exit
