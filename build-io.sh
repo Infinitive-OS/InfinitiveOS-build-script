@@ -121,6 +121,32 @@ function build () {
 	echo -e " *holds tiki torch*"
 }
 
+function defconfig {
+	# Red
+	tput setaf 1
+	tput bold
+
+	echo -e "  Loading defaults..\n"
+
+	mode=default
+
+	tput sgr0
+	tput setaf 1
+
+	#Option values
+	MakeClean=1
+	MakeClobber=0
+	MakeInstallClean=0
+	RepoSyncBeforeBuild=1
+	MakeApp=0
+	buildEnvSetup=1
+
+	#Restore Green
+	tput sgr0
+	tput setaf 2
+	return
+}
+
 function processMenu() {
 	case $mainMenuChoice in
 		1) syncRepo ;;
@@ -129,7 +155,7 @@ function processMenu() {
 		4) exit ;;
 		5) export buildEnvSetup=0 ;;
 		6) export buildEnvSetup=1 ;;
-		99) source defconfig.sh ;;
+		99) defconfig ;; #Reset to default settings
 		*) echo "  Invalid Option! ERROR!" ;;
 	esac
 	echo -e " Press any key to continue..."
@@ -138,7 +164,7 @@ function processMenu() {
 }
 
 #Load default configurations
-source defconfig.sh
+defconfig
 
 while [[ true ]]; do
 	io_main_splash
