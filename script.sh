@@ -62,6 +62,7 @@ while ("$endscript" == "true" && "$endscript" != "false")
 do
 clear
 
+source defconfig.sh
 
 #MENU
 
