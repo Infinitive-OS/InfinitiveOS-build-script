@@ -13,8 +13,4 @@ echo "Making a quick upgrate for system files"
 
 sudo apt-get upgrade
 
-echo "****************************************"
-echo "Going back now to the main script widnow"
-echo "****************************************"
-
 exit

@@ -74,6 +74,9 @@ function processMenu() {
 		4) exit ;;
 		*) echo "  Invalid Option! ERROR!" ;;
 	esac
+	read blank
+	echo -e " Press any key to continue..."
+	clear
 }
 
 io_main_splash
@@ -102,3 +105,5 @@ while [[ true ]]; do
 	io_main_splash
 	displayMenu	
 done
+
+$normal
