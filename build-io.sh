@@ -30,7 +30,6 @@ function io_main_splash () {
 	tput bold
 	tput setaf 2 
 	echo -e ""
-	echo -e ""
 	echo -e "  .___        _____.__       .__  __  .__             ________    _________ "  
 	echo -e "  |   | _____/ ____\__| ____ |__|/  |_|__|__  __ ____ \_____  \  /   _____/ " 
 	echo -e "  |   |/    \   __\|  |/    \|  \   __\  \  \/ // __ \ /   |   \ \_____  \  "
@@ -44,7 +43,7 @@ function io_main_splash () {
 	echo -e "  /_______  /___|  /\_/ |__||__|   \____/|___|  /__|_|  /\___  >___|  /__|   /_______  /\___  >__| |____/|   __/  "
 	echo -e "         \/     \/                           \/      \/     \/     \/               \/     \/           |__|   "
 	echo -e "                                                                                                               "
-	echo -e " "
+	echo -e "                                                                         Mode: $mode "
 	echo -e " "
 	tput sgr0
 	tput setaf 2
@@ -85,10 +84,17 @@ function currentConfig () {
 	echo -e ""
 	tput sgr0
 	tput setaf 2
+
+	if [[ $MakeClean != 1 || $MakeClobber != 0 || $MakeInstallClean != 0 || $RepoSyncBeforeBuild != 1 || $buildEnvSetup != 1 ]]; then
+		mode=Custom
+		echo -e "  Defconfig changed. \n"
+		echo -e "  Switched to custom mode."
+		return 0
+	fi
 }
 
 function syncRepoMenu () {
-	currentConfig
+	echo -e "config menu for sync"
 }
 
 function syncRepo () {
@@ -112,9 +118,6 @@ function syncRepo () {
 	echo -e ""
 	read blank
 
-
-	clear
-
 	syncRepoMenu
 }
 
@@ -133,6 +136,9 @@ function processMenu() {
 		2) ConfigureBuild ;;
 		3) build ;;
 		4) exit ;;
+		5) export buildEnvSetup=0 ;;
+		6) export buildEnvSetup=1 ;;
+		99) source defconfig.sh ;;
 		*) echo "  Invalid Option! ERROR!" ;;
 	esac
 	read blank
@@ -140,14 +146,18 @@ function processMenu() {
 	clear
 }
 
-io_main_splash
+function manager {
+	while [[ true ]]; do
+		io_main_splash
+		displayMainMenu
+	done
+}
 
 #Load default configurations
 source defconfig.sh
 
-while [[ true ]]; do
-	io_main_splash
-	displayMainMenu	
-done
+manager
+
+echo "sayo nara"
 
 $normal

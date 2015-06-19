@@ -4,7 +4,9 @@
 tput setaf 1
 tput bold
 
-echo -e "  Settings defaults..\n"
+echo -e "  Loading defaults..\n"
+
+mode=default
 
 tput sgr0
 tput setaf 1
@@ -16,9 +18,6 @@ MakeInstallClean=0
 RepoSyncBeforeBuild=1
 MakeApp=0
 buildEnvSetup=1
-
-sleep 2
-clear
 
 #Restore Green
 tput sgr0
