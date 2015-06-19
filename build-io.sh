@@ -42,14 +42,15 @@ function io_main_splash () {
 
 function displayMainMenu() {
 	echo -e "  *************************************"
-	echo -e "	    Target Device:" $device
+	echo -e "	  Target Device: io_$device     "
 	echo -e "  *************************************"
 	currentConfig
 	echo -e "  1. Sync InfinitiveOS Repo"
 	echo -e "  2. Configure Build parameters"
-	echo -e "  3. Build InfinitiveOS for $device"
-	echo -e "  "
-	echo -e "  4. Exit"
+	echo -e "  3. Set-up current Target device"
+	echo -e "  4. Configure Cherry-pick script"
+	echo -e "  5. Build InfinitiveOS for $device"
+	echo -e "  6. Exit"
 	echo -e ""
 	echo -e "  Enter choice : \c"
 	read mainMenuChoice
@@ -65,13 +66,14 @@ function currentConfig () {
 	tput bold 
 	tput setaf 6
 	echo -e " Enviornment options: "
-	echo -e "  buildEnvSetup       :     $buildEnvSetup"
+	echo -e " buildEnvSetup       :     $buildEnvSetup"
 	echo -e ""
 	echo -e " Make options:"
-	echo -e "  makeClean           :     $makeClean"
-	echo -e "  makeClobber         :     $makeClobber"
-	echo -e "  makeInstallClean    :     $makeInstallClean"
-	echo -e "  repoSyncBeforeBuild :     $repoSyncBeforeBuild"
+	echo -e " makeClean           :     $makeClean"
+	echo -e " makeClobber         :     $makeClobber"
+	echo -e " makeInstallClean    :     $makeInstallClean"
+	echo -e " repoSyncBeforeBuild :     $repoSyncBeforeBuild"
+	echo -e " cherrypick          :     $cherrypick"
 	echo -e ""
 	tput sgr0
 	tput setaf 2
@@ -117,38 +119,167 @@ function configureBuild() {
 	echo -e "     | Submit values in binary bits"
 	echo -e "     | 1 for Yes, and 0 for No"
 	echo -e ""
-	echo -e "  Is you Build enviornment set up? : buildEnvSetup :  \c" && read buildEnvSetup
+	echo -e "Is you Build enviornment set up? : buildEnvSetup :  \c" && read buildEnvSetup
 	if [[ "$buildEnvSetup" == "0" || "$buildEnvSetup" == "1" ]]; then
 		echo -e ""
 	else
-	echo -e " ERROR! Wrong parameters passed. Reconfigure"
+	echo -e "ERROR! Wrong parameters passed. Reconfigure"
 	configureBuild
 	fi
 
-	echo -e "  make clean before starting the build? : MakeClean :  \c" && read makeClean
+	echo -e "Make clean before starting the build? : MakeClean :  \c" && read makeClean
 	if [[ "$makeClean" == 0 || "$makeClean" == 1 ]]; then
 		echo -e ""
 	else
-	echo -e " ERROR! Wrong parameters passed. Reconfigure"
+	echo -e "ERROR! Wrong parameters passed. Reconfigure"
 	configureBuild
 	fi
 
-	echo -e "  make clobber before starting the build? : MakeClobber :  \c" && read makeClobber
+	echo -e "Make clobber before starting the build? : MakeClobber :  \c" && read makeClobber
 	if [[ $makeClobber == 0 || $makeClobber == 1 ]]; then
 		echo -e ""
 	else
-	echo -e " ERROR! Wrong parameters passed. Reconfigure"
+	echo -e "ERROR! Wrong parameters passed. Reconfigure"
 	configureBuild
 	fi
 
-	echo -e "  make InstallClean before starting the build? : MakeInstallClean :  \c" && read makeInstallClean
+	echo -e "Make InstallClean before starting the build? : MakeInstallClean :  \c" && read makeInstallClean
 	if [[ $makeInstallClean == 0 || $makeInstallClean == 1 ]]; then
+		echo -e ""
+	else
+	echo -e "ERROR! Wrong parameters passed. Reconfigure"
+	configureBuild
+	fi
+
+	echo -e "Repo sync before starting the build? : repoSyncBeforeBuild :  \c" && read repoSyncBeforeBuild
+	if [[ $repoSyncBeforeBuild == 0 || $repoSyncBeforeBuild == 1 ]]; then
+		echo -e ""
+	else
+	echo -e "ERROR! Wrong parameters passed. Reconfigure"
+	configureBuild
+	fi
+
+	echo -e "Use cherry-pick script before starting the build : cherrypick :  \c" && read cherrypick
+	if [[ $cherrypick == 0 || $cherrypick == 1 ]]; then
 		echo -e ""
 	else
 	echo -e " ERROR! Wrong parameters passed. Reconfigure"
 	configureBuild
 	fi
+
 }
+
+function DeviceTarget() {
+	
+	tput sgr0
+	tput setaf 4
+	echo -e "Official Devices"
+	echo -e ""
+	echo -e ""
+	echo -e "Samsung Galaxy S+ (ariesve)"
+	echo -e "Samsung Galaxy Grand Duos (I9082)"
+	echo -e "Samsung Galaxy S5 Mini (kmini3g)"
+	echo -e "Samsung Galaxy S3 Neo (s3ve3g)"
+	echo -e "Motorola Moto G 2014 (titan)"
+	echo -e "Motorola Moto G (falcon)"
+	echo -e "Motorola Moto E (condor)"
+	echo -e "Sony Xperia L (taoshan)"
+	echo -e "Sony Xperia Z (yuga)"
+	echo -e "Sony Xperia Z2 (honami)"
+	echo -e "Sony Xperia Z3 (leo)"
+	echo -e "Xiaomi Redmi 1S (armani)"
+	echo -e "Xiaomi Mi3 (cancro)"
+	echo -e "Yu Yureka (tomato)"
+	echo -e ""
+	echo -e ""
+	sleep 1
+	tput setaf 2
+	echo -e "Is your device in one of the listed ones?"
+	echo -e "Insert 1 or 0"
+	read devicetargetchoice
+	if (test $devicetargetchoice = "1"); then
+	echo -e "Checking if the build environment is initialized.."
+		if (test $buildEnvSetup = "1"); then
+		echo -e "Build environment already initialized skipping..."
+		else 
+		$buildEnvSetup=1
+		fi
+	echo -e "Insert the codename of the device which you will gonna build to:"
+	read device
+	cd ..
+	source build/./envsetup.sh
+	cd io_build
+	echo -e "Going to make Breakfast for the $device device"
+	
+	breakfast $device
+	else
+	echo -e "Going to build for an unofficial device, and you already set-up your device tree?"
+	read undevice
+		if(test $undevice = "1"); then
+		echo -e "Insert your device codename then, in order to make it as current target"
+		read device
+		cd ..
+		source build/./envsetup.sh
+		cd io_build
+		breakfast $device
+	else	
+	echo -e "If your device is not listed you will gonna need to insert the repos to fetch in the local manifest"
+	sleep 2
+	cd ..	
+	cd .repo
+	mkdir local_manifests
+	nano local_manifest.xml
+	cd ..
+	cd io_build
+	echo -e "Press enter when you finished editing the local_manifest"
+	read blank
+	echo -e "Going to repo sync now, in order to include the repo from the local_manifest"
+	repo sync
+	clear
+	echo -e "Now, you just have to type the codename of your device :)"
+	read device
+	cd ..
+	source build/./envsetup.sh
+	cd io_build
+	breakfast $device
+	clear
+	echo -e "Breakfast completed, ROM build is set now for the $device device"
+	fi 
+	fi
+	
+	tput sgr0
+}
+	
+
+function cherrypick() {
+	
+	clear
+	tput setaf bold
+	tput setaf 3
+	
+	echo -e "In order to proceed with this operation we need to check if you already choosed a target device"
+	if (test $device != generic); then
+	echo -e "Ok we can proceed..."
+	sleep 2
+	echo -e "Basically this script will be made separately for each device"
+	echo -e "And this script will be used for the developers who need to cherry pick some propietary stuff for the device to compile the ROM"
+	echo -e "And to don't repeat this every time, it's better to do a script from this and run it every time you make a new build for the device"
+	echo -e "I think you already know how cherry-pick works so i won't stay here explain to you how to do that :)"
+	echo -e "You are currently building for $device"
+	
+	echo -e "Press enter when you are ready"
+	read blank
+	
+	nano cherry_$device.sh
+
+	else 
+
+	echo -e "You need to choose a target device first!"
+	sleep 1
+	DeviceTarget
+
+	fi 
+}    
 
 function build () {
 	echo -e " *holds tiki torch and dances*"
@@ -173,6 +304,7 @@ function defconfig {
 	repoSyncBeforeBuild=1
 	makeApp=0
 	buildEnvSetup=1
+	cherrypick=0
 
 	#Restore Green
 	tput sgr0
@@ -184,10 +316,12 @@ function processMenu() {
 	case $mainMenuChoice in
 		1) syncRepo ;;
 		2) configureBuild ;;
-		3) build ;;
-		4) exit ;;
-		5) export buildEnvSetup=0 ;;
-		6) export buildEnvSetup=1 ;;
+		3) DeviceTarget;;
+		4) cherrypick;;
+		5) build ;;
+		6) exit ;;
+		7) export buildEnvSetup=0 ;;
+		8) export buildEnvSetup=1 ;;
 		99) defconfig ;; #Reset to default settings
 		*) echo "  Invalid Option! ERROR!" ;;
 	esac
@@ -205,3 +339,4 @@ while [[ true ]]; do
 done
 
 $normal
+
