@@ -66,11 +66,24 @@ function displayMenu() {
 	processMenu $menuChoice
 }
 
+function SyncRepo () {
+	echo -e " Lets sync something here ( shed your gbs ;) )"
+}
+
+function ConfigureBuild() {
+	echo -e " Lets Configure the build options -_-" 
+	echo -e "Because you are dont agree wth my defaults -_-"
+}
+
+function build () {
+	echo -e "*holds tiki torch*"
+}
+
 function processMenu() {
 	case $menuChoice in
-		1) echo SyncRepo ;;
-		2) echo ConfigureBuild ;;
-		3) echo "three" ;;
+		1) SyncRepo ;;
+		2) ConfigureBuild ;;
+		3) build ;;
 		4) exit ;;
 		*) echo "  Invalid Option! ERROR!" ;;
 	esac
