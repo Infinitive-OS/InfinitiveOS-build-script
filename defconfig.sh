@@ -26,8 +26,4 @@ if [ $RepoSyncBeforeBuild = 1 ]; then
         echo "Repo sync will be done before the build."
 fi
 
-if [ $RepoSyncBeforeBuild = 1 ]; then
-        echo "Repo sync will be done before the build."
-fi
-
 return
