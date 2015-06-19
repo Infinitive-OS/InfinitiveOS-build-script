@@ -65,23 +65,22 @@ function currentConfig () {
 	tput bold 
 	tput setaf 6
 	echo -e " Enviornment options: "
-	echo -e "  buildEnvSetup    :        $buildEnvSetup"
+	echo -e "  buildEnvSetup       :     $buildEnvSetup"
 	echo -e ""
 	echo -e " Make options:"
-	echo -e "  MakeClean           :     $MakeClean"
-	echo -e "  MakeClobber         :     $MakeClobber"
-	echo -e "  MakeInstallClean    :     $MakeInstallClean"
-	echo -e "  RepoSyncBeforeBuild :     $RepoSyncBeforeBuild"
+	echo -e "  makeClean           :     $makeClean"
+	echo -e "  makeClobber         :     $makeClobber"
+	echo -e "  makeInstallClean    :     $makeInstallClean"
+	echo -e "  repoSyncBeforeBuild :     $repoSyncBeforeBuild"
 	echo -e ""
 	tput sgr0
 	tput setaf 2
 
-	if [[ $MakeClean != 1 || $MakeClobber != 0 || $MakeInstallClean != 0 || $RepoSyncBeforeBuild != 1 || $buildEnvSetup != 1 ]]; then
-		mode=Custom
-		echo -e "  Defconfig changed. \n"
-		echo -e "  Switched to custom mode."
-		return 0
-	fi
+	#if [[ $MakeClean != 1 || $MakeClobber != 0 || $MakeInstallClean != 1 || $RepoSyncBeforeBuild != 1 || $buildEnvSetup != 1 ]]; then
+	#	mode=Custom
+	#	echo -e "  Defconfig changed. \n"
+	#	echo -e "  Switched to custom mode."
+	#fi
 }
 
 function syncRepoMenu () {
@@ -112,13 +111,47 @@ function syncRepo () {
 	syncRepoMenu
 }
 
-function ConfigureBuild() {
-	echo -e " Lets Configure the build options -_-" 
-	echo -e " Because you are dont agree wth my defaults -_-"
+function configureBuild() {
+	echo -e "begining to edit the default build options."
+	echo -e "      "
+	echo -e "     | Submit values in binary bits"
+	echo -e "     | 1 for Yes, and 0 for No"
+	echo -e ""
+	echo -e "  Is you Build enviornment set up? : buildEnvSetup :  \c" && read buildEnvSetup
+	if [[ "$buildEnvSetup" == "0" || "$buildEnvSetup" == "1" ]]; then
+		echo -e ""
+	else
+	echo -e " ERROR! Wrong parameters passed. Reconfigure"
+	configureBuild
+	fi
+
+	echo -e "  make clean before starting the build? : MakeClean :  \c" && read makeClean
+	if [[ "$makeClean" == 0 || "$makeClean" == 1 ]]; then
+		echo -e ""
+	else
+	echo -e " ERROR! Wrong parameters passed. Reconfigure"
+	configureBuild
+	fi
+
+	echo -e "  make clobber before starting the build? : MakeClobber :  \c" && read makeClobber
+	if [[ $makeClobber == 0 || $makeClobber == 1 ]]; then
+		echo -e ""
+	else
+	echo -e " ERROR! Wrong parameters passed. Reconfigure"
+	configureBuild
+	fi
+
+	echo -e "  make InstallClean before starting the build? : MakeInstallClean :  \c" && read makeInstallClean
+	if [[ $makeInstallClean == 0 || $makeInstallClean == 1 ]]; then
+		echo -e ""
+	else
+	echo -e " ERROR! Wrong parameters passed. Reconfigure"
+	configureBuild
+	fi
 }
 
 function build () {
-	echo -e " *holds tiki torch*"
+	echo -e " *holds tiki torch and dances*"
 }
 
 function defconfig {
@@ -134,11 +167,11 @@ function defconfig {
 	tput setaf 1
 
 	#Option values
-	MakeClean=1
-	MakeClobber=0
-	MakeInstallClean=0
-	RepoSyncBeforeBuild=1
-	MakeApp=0
+	makeClean=1
+	makeClobber=0
+	makeInstallClean=0
+	repoSyncBeforeBuild=1
+	makeApp=0
 	buildEnvSetup=1
 
 	#Restore Green
@@ -150,7 +183,7 @@ function defconfig {
 function processMenu() {
 	case $mainMenuChoice in
 		1) syncRepo ;;
-		2) ConfigureBuild ;;
+		2) configureBuild ;;
 		3) build ;;
 		4) exit ;;
 		5) export buildEnvSetup=0 ;;
