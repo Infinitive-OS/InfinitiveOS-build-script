@@ -36,14 +36,8 @@ function io_main_splash () {
 	echo -e "  |   |   |  \  |  |  |   |  \  ||  | |  |\   /\  ___//    |    \/        \ "
 	echo -e "  |___|___|  /__|  |__|___|  /__||__| |__| \_/  \___  >_______  /_______  / "
 	echo -e "          \/              \/                       \/        \/          \/"
-	echo -e "   ___________           .__                                            __      _________       __               "
-	echo -e "   \_   _____/ _______  _|__|______  ____   ____   _____   ____   _____/  |_   /   _____/ _____/  |_ __ ________ "  
-	echo -e "   |    __)_ /    \  \/ /  \_  __ \/  _ \ /    \ /     \_/ __ \ /    \   __\  \_____  \_/ __ \   __\  |  \____ \ "
-	echo -e "   |        \   |  \   /|  ||  | \(  <_> )   |  \  Y Y  \  ___/|   |  \  |    /        \  ___/|  | |  |  /  |_> > "
-	echo -e "  /_______  /___|  /\_/ |__||__|   \____/|___|  /__|_|  /\___  >___|  /__|   /_______  /\___  >__| |____/|   __/  "
-	echo -e "         \/     \/                           \/      \/     \/     \/               \/     \/           |__|   "
-	echo -e "                                                                                                               "
-	echo -e "                                                                         Mode: $mode "
+	echo -e ""
+	echo -e "                                                             Mode:  $mode "
 	echo -e " "
 	tput sgr0
 	tput setaf 2
@@ -141,8 +135,8 @@ function processMenu() {
 		99) source defconfig.sh ;;
 		*) echo "  Invalid Option! ERROR!" ;;
 	esac
-	read blank
 	echo -e " Press any key to continue..."
+	read blank
 	clear
 }
 
