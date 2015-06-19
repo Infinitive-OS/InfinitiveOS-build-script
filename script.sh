@@ -23,34 +23,64 @@ bldblu=${txtbld}$(tput setaf 4) # Bold blue
 bldcya=${txtbld}$(tput setaf 6) # Bold cyan
 normal='tput sgr0'
 
+# Default Device
+device=generic
+
 function io_main_splash () {
 	tput bold
 	tput setaf 2 
 	echo -e ""
 	echo -e ""
-	echo -e " .___        _____.__       .__  __  .__             ________    _________ "  
-	echo -e " |   | _____/ ____\__| ____ |__|/  |_|__|__  __ ____ \_____  \  /   _____/ " 
-	echo -e " |   |/    \   __\|  |/    \|  \   __\  \  \/ // __ \ /   |   \ \_____  \  "
-	echo -e " |   |   |  \  |  |  |   |  \  ||  | |  |\   /\  ___//    |    \/        \ "
-	echo -e " |___|___|  /__|  |__|___|  /__||__| |__| \_/  \___  >_______  /_______  / "
-	echo -e "         \/              \/                       \/        \/          \/"
-	echo -e " ___________           .__                                            __      _________       __               "
-	echo -e " \_   _____/ _______  _|__|______  ____   ____   _____   ____   _____/  |_   /   _____/ _____/  |_ __ ________ "  
-	echo -e " |    __)_ /    \  \/ /  \_  __ \/  _ \ /    \ /     \_/ __ \ /    \   __\  \_____  \_/ __ \   __\  |  \____ \ "
-	echo -e " |        \   |  \   /|  ||  | \(  <_> )   |  \  Y Y  \  ___/|   |  \  |    /        \  ___/|  | |  |  /  |_> > "
-	echo -e "/_______  /___|  /\_/ |__||__|   \____/|___|  /__|_|  /\___  >___|  /__|   /_______  /\___  >__| |____/|   __/  "
-	echo -e "        \/     \/                           \/      \/     \/     \/               \/     \/           |__|   "
-	echo -e "                                                                                                              "
-	echo -e ""
-	echo -e ""
+	echo -e "  .___        _____.__       .__  __  .__             ________    _________ "  
+	echo -e "  |   | _____/ ____\__| ____ |__|/  |_|__|__  __ ____ \_____  \  /   _____/ " 
+	echo -e "  |   |/    \   __\|  |/    \|  \   __\  \  \/ // __ \ /   |   \ \_____  \  "
+	echo -e "  |   |   |  \  |  |  |   |  \  ||  | |  |\   /\  ___//    |    \/        \ "
+	echo -e "  |___|___|  /__|  |__|___|  /__||__| |__| \_/  \___  >_______  /_______  / "
+	echo -e "          \/              \/                       \/        \/          \/"
+	echo -e "   ___________           .__                                            __      _________       __               "
+	echo -e "   \_   _____/ _______  _|__|______  ____   ____   _____   ____   _____/  |_   /   _____/ _____/  |_ __ ________ "  
+	echo -e "   |    __)_ /    \  \/ /  \_  __ \/  _ \ /    \ /     \_/ __ \ /    \   __\  \_____  \_/ __ \   __\  |  \____ \ "
+	echo -e "   |        \   |  \   /|  ||  | \(  <_> )   |  \  Y Y  \  ___/|   |  \  |    /        \  ___/|  | |  |  /  |_> > "
+	echo -e "  /_______  /___|  /\_/ |__||__|   \____/|___|  /__|_|  /\___  >___|  /__|   /_______  /\___  >__| |____/|   __/  "
+	echo -e "         \/     \/                           \/      \/     \/     \/               \/     \/           |__|   "
+	echo -e "                                                                                                               "
+	echo -e " "
+	echo -e " "
 	tput sgr0
 	tput setaf 2
+}
+
+function displayMenu() {
+	echo -e "  *************************************************"
+	echo -e "	    Target Device:" $device
+	echo -e "  *************************************************"
+	echo -e ""
+	echo -e "  1. Sync InfinitiveOS Repo"
+	echo -e "  2. Configure Build parameters"
+	echo -e "  3. Build InfinitiveOS for $device"
+	echo -e "  "
+	echo -e "  4. Exit"
+	echo -e ""
+	echo -e "  Enter choice : \c"
+	read menuChoice
+	processMenu $menuChoice
+}
+
+function processMenu() {
+	case $menuChoice in
+		1) echo SyncRepo ;;
+		2) echo ConfigureBuild ;;
+		3) echo "three" ;;
+		4) exit ;;
+		*) echo "  Invalid Option! ERROR!" ;;
+	esac
 }
 
 io_main_splash
 
 echo -e "${bldcya}>>   Would you like us to upgrade and check for dependencies to avoid errors while building? \n"
 echo -e "${bldcya}    (yes/no) \c"
+tput sgr0
 tput setaf 2
 read askDependencies
 if [[ $askDependencies = "yes" || $askDependencies = "Yes" || $askDependencies = "YES" ]]; then
@@ -60,53 +90,15 @@ if [[ $askDependencies = "yes" || $askDependencies = "Yes" || $askDependencies =
 	x-terminal-emulator -e ./dependencies.sh 
 fi
 
-echo -e "Press any key to continue after the upgrade is completed"
+echo -e ""
+echo -e "  Press any key to continue after the upgrade is completed \c"
+echo -e ""
+read blank
 
-read enterproceed
-echo -e "Going to start in a few seconds ----------------------->"
-sleep 1
-echo -e "Script created by Calin Neamtu aka nilac8991 for InfinitiveOS"
-sleep 1
-echo -e "The script is licensed under Apache license so everyone can re-use it but with propper credits"
-sleep 1
-echo -e "Loading the menu..."
-sleep 4 
-
-#Menu loop part 
-
-endscript="true"
-devicebuild="Not defined"
-
-while ("$endscript" == "true" && "$endscript" != "false")
-do
-clear
-
+#Load default configurations
 source defconfig.sh
 
-#MENU
-
-io_main_splash
-
-echo -e "*********************************************************************************************************"
-echo -e "*********************************************************************************************************"
-echo -e "	Target Device:" $devicebuild                                                                            
-echo -e "*********************************************************************************************************"
-echo -e "*********************************************************************************************************"
-echo -e ""
-echo -e ""
-echo -e ""
-echo -e "	1- Repo sync the Repo sources " 
-echo -e "	2- Choose the target device "
-echo -e "        3- Exit "
-read menuchoose
-if (test "$menuchoose" = "1"); then
-clear
-repo sync
-fi
-if (test "$menuchoose" = "2"); then
-echo -e "AHAHAh SBAM!"
-fi  
-if (test "$menuchoose" = "3"); then
-endscript="false"
-fi
-done 
+while [[ true ]]; do
+	io_main_splash
+	displayMenu	
+done
