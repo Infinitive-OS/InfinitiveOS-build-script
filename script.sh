@@ -47,10 +47,18 @@ function io_main_splash () {
 	tput setaf 2
 }
 
-echo -e "Checking if there are updates for the dependencies..."
-sleep 2
+io_main_splash
 
-x-terminal-emulator -e ./dependencies.sh 
+echo -e "${bldcya}>>   Would you like us to upgrade and check for dependencies to avoid errors while building? \n"
+echo -e "${bldcya}    (yes/no) \c"
+tput setaf 2
+read askDependencies
+if [[ $askDependencies = "yes" || $askDependencies = "Yes" || $askDependencies = "YES" ]]; then
+	echo -e ""
+	echo -e "   > Running the dependencies script"
+	echo -e ""
+	x-terminal-emulator -e ./dependencies.sh 
+fi
 
 echo -e "Press any key to continue after the upgrade is completed"
 
