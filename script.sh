@@ -5,6 +5,8 @@
 echo -e '\0033\0143'
 clear
 
+# ALL HAIL GREEN
+tput setaf 2 
 
 # Our Rainbow
 red='tput setaf 1'              # red
@@ -22,33 +24,27 @@ bldcya=${txtbld}$(tput setaf 6) # Bold cyan
 normal='tput sgr0'
 
 function io_main_splash () {
-	sleep 0.075
+	tput bold
+	tput setaf 2 
+	echo -e ""
+	echo -e ""
 	echo -e " .___        _____.__       .__  __  .__             ________    _________ "  
-	sleep 0.075                              
 	echo -e " |   | _____/ ____\__| ____ |__|/  |_|__|__  __ ____ \_____  \  /   _____/ " 
-	sleep 0.075                              
 	echo -e " |   |/    \   __\|  |/    \|  \   __\  \  \/ // __ \ /   |   \ \_____  \  "
-	sleep 0.075                               
 	echo -e " |   |   |  \  |  |  |   |  \  ||  | |  |\   /\  ___//    |    \/        \ "
-	sleep 0.075                               
 	echo -e " |___|___|  /__|  |__|___|  /__||__| |__| \_/  \___  >_______  /_______  / "
-	sleep 0.075                                
 	echo -e "         \/              \/                       \/        \/          \/"
-	sleep 0.075
 	echo -e " ___________           .__                                            __      _________       __               "
-	sleep 0.075
 	echo -e " \_   _____/ _______  _|__|______  ____   ____   _____   ____   _____/  |_   /   _____/ _____/  |_ __ ________ "  
-	sleep 0.075
 	echo -e " |    __)_ /    \  \/ /  \_  __ \/  _ \ /    \ /     \_/ __ \ /    \   __\  \_____  \_/ __ \   __\  |  \____ \ "
-	sleep 0.075
 	echo -e " |        \   |  \   /|  ||  | \(  <_> )   |  \  Y Y  \  ___/|   |  \  |    /        \  ___/|  | |  |  /  |_> > "
-	sleep 0.075
 	echo -e "/_______  /___|  /\_/ |__||__|   \____/|___|  /__|_|  /\___  >___|  /__|   /_______  /\___  >__| |____/|   __/  "
-	sleep 0.075
 	echo -e "        \/     \/                           \/      \/     \/     \/               \/     \/           |__|   "
-	sleep 0.075
 	echo -e "                                                                                                              "
-	sleep 0.075
+	echo -e ""
+	echo -e ""
+	tput sgr0
+	tput setaf 2
 }
 
 echo -e "Checking if there are updates for the dependencies..."
@@ -67,7 +63,6 @@ echo -e "The script is licensed under Apache license so everyone can re-use it b
 sleep 1
 echo -e "Loading the menu..."
 sleep 4 
-
 
 #Menu loop part 
 
