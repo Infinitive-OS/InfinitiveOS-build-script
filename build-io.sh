@@ -146,18 +146,12 @@ function processMenu() {
 	clear
 }
 
-function manager {
-	while [[ true ]]; do
-		io_main_splash
-		displayMainMenu
-	done
-}
-
 #Load default configurations
 source defconfig.sh
 
-manager
-
-echo "sayo nara"
+while [[ true ]]; do
+	io_main_splash
+	displayMainMenu
+done
 
 $normal
