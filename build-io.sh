@@ -95,6 +95,23 @@ function syncRepo () {
 	echo -e ""
 	echo -e " Lets sync something here ( get set to shed your gbs ;) )"
 	echo -e ""
+	echo -e "${bldcya}>>   Would you like us to upgrade and check for dependencies to avoid errors while building? \n"
+	echo -e "${bldcya}    (yes/no) \c"
+	tput sgr0
+	tput setaf 2
+	read askDependencies
+	if [[ $askDependencies = "yes" || $askDependencies = "Yes" || $askDependencies = "YES" ]]; then
+		echo -e ""
+		echo -e "   > Running the dependencies script"
+		echo -e ""
+		x-terminal-emulator -e ./dependencies.sh 
+	fi
+
+	echo -e ""
+	echo -e "  Press any key to continue after the upgrade is completed "
+	echo -e ""
+	read blank
+
 
 	clear
 
@@ -124,23 +141,6 @@ function processMenu() {
 }
 
 io_main_splash
-
-echo -e "${bldcya}>>   Would you like us to upgrade and check for dependencies to avoid errors while building? \n"
-echo -e "${bldcya}    (yes/no) \c"
-tput sgr0
-tput setaf 2
-read askDependencies
-if [[ $askDependencies = "yes" || $askDependencies = "Yes" || $askDependencies = "YES" ]]; then
-	echo -e ""
-	echo -e "   > Running the dependencies script"
-	echo -e ""
-	x-terminal-emulator -e ./dependencies.sh 
-fi
-
-echo -e ""
-echo -e "  Press any key to continue after the upgrade is completed "
-echo -e ""
-read blank
 
 #Load default configurations
 source defconfig.sh
