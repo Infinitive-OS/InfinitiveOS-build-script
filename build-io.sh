@@ -50,11 +50,11 @@ function io_main_splash () {
 	tput setaf 2
 }
 
-function displayMenu() {
-	echo -e "  *************************************************"
+function displayMainMenu() {
+	echo -e "  *************************************"
 	echo -e "	    Target Device:" $device
-	echo -e "  *************************************************"
-	echo -e ""
+	echo -e "  *************************************"
+	currentConfig
 	echo -e "  1. Sync InfinitiveOS Repo"
 	echo -e "  2. Configure Build parameters"
 	echo -e "  3. Build InfinitiveOS for $device"
@@ -62,26 +62,57 @@ function displayMenu() {
 	echo -e "  4. Exit"
 	echo -e ""
 	echo -e "  Enter choice : \c"
-	read menuChoice
-	processMenu $menuChoice
+	read mainMenuChoice
+	processMenu $mainMenuChoice
 }
 
-function SyncRepo () {
-	echo -e " Lets sync something here ( shed your gbs ;) )"
+function currentConfig () {
+	echo -e " "
+	echo -e "  NOTE : We are using Binary inputs"
+	echo -e "  1 for Yes "
+	echo -e "  0 for No "
+	echo -e ""
+	tput bold 
+	tput setaf 6
+	echo -e " Enviornment options: "
+	echo -e "  buildEnvSetup    :        $buildEnvSetup"
+	echo -e ""
+	echo -e " Make options:"
+	echo -e "  MakeClean           :     $MakeClean"
+	echo -e "  MakeClobber         :     $MakeClobber"
+	echo -e "  MakeInstallClean    :     $MakeInstallClean"
+	echo -e "  RepoSyncBeforeBuild :     $RepoSyncBeforeBuild"
+	echo -e ""
+	tput sgr0
+	tput setaf 2
+}
+
+function syncRepoMenu () {
+	currentConfig
+}
+
+function syncRepo () {
+	echo -e ""
+	echo -e " Lets sync something here ( get set to shed your gbs ;) )"
+	echo -e ""
+
+	clear
+
+	syncRepoMenu
 }
 
 function ConfigureBuild() {
 	echo -e " Lets Configure the build options -_-" 
-	echo -e "Because you are dont agree wth my defaults -_-"
+	echo -e " Because you are dont agree wth my defaults -_-"
 }
 
 function build () {
-	echo -e "*holds tiki torch*"
+	echo -e " *holds tiki torch*"
 }
 
 function processMenu() {
-	case $menuChoice in
-		1) SyncRepo ;;
+	case $mainMenuChoice in
+		1) syncRepo ;;
 		2) ConfigureBuild ;;
 		3) build ;;
 		4) exit ;;
@@ -107,7 +138,7 @@ if [[ $askDependencies = "yes" || $askDependencies = "Yes" || $askDependencies =
 fi
 
 echo -e ""
-echo -e "  Press any key to continue after the upgrade is completed \c"
+echo -e "  Press any key to continue after the upgrade is completed "
 echo -e ""
 read blank
 
@@ -116,7 +147,7 @@ source defconfig.sh
 
 while [[ true ]]; do
 	io_main_splash
-	displayMenu	
+	displayMainMenu	
 done
 
 $normal

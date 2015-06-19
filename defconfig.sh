@@ -11,26 +11,11 @@ tput setaf 1
 
 #Option values
 MakeClean=1
-MakeClobber=1
-MakeInstallClean=1
+MakeClobber=0
+MakeInstallClean=0
 RepoSyncBeforeBuild=1
 MakeApp=0
-
-if [ $MakeClean = 1 ]; then
-	echo "  make clean will be done before the build."
-fi
-
-if [ $MakeClobber = 1 ]; then
-        echo "  make clobber will be done before the build."
-fi
-
-if [ $MakeInstallClean = 1 ]; then
-        echo "  make installclean will be done before the build."
-fi
-
-if [ $RepoSyncBeforeBuild = 1 ]; then
-        echo "  Repo sync will be done before the build."
-fi
+buildEnvSetup=1
 
 sleep 2
 clear
