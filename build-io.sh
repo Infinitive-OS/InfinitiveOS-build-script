@@ -47,13 +47,21 @@ function displayMainMenu() {
 	currentConfig
 	echo -e "  1. Sync InfinitiveOS Repo"
 	echo -e "  2. Configure Build parameters"
-	echo -e "  3. Set-up current Target device"
-	echo -e "  4. Configure Cherry-pick script"
-	if( test $device != "generic"); then 
-	echo -e "  5. Build InfinitiveOS for $device"
+	if [[ $shellInTargetDir -eq 1 ]]; then
+		echo -e "  3. Set-up current Target device"
+		echo -e "  4. Configure Cherry-pick script"
+		if( test $device != "generic"); then 
+		echo -e "  5. Build InfinitiveOS for $device"
+		fi
 	fi
 	echo -e "  6. Exit"
 	echo -e ""
+	if [[ $shellInTargetDir -eq 0 ]]; then
+		echo -e "   shellInTargetDir is set to False. "
+		echo -e "      if the shell is in same directory as the InfinitiveOS ROM sources. Press 12"
+		echo -e "         Else press 1 to sync InfinitiveOS ROM sources"
+		echo -e ""
+	fi
 	echo -e "  Enter choice : \c"
 	read mainMenuChoice
 	processMenu $mainMenuChoice
@@ -67,6 +75,9 @@ function currentConfig () {
 	echo -e ""
 	tput bold 
 	tput setaf 6
+	echo -e "Shell Options:"
+	echo -e " shellInTargetDir    :     $shellInTargetDir"
+	echo -e ""
 	echo -e " Enviornment options: "
 	echo -e " buildEnvSetup       :     $buildEnvSetup"
 	echo -e ""
@@ -88,7 +99,9 @@ function currentConfig () {
 }
 
 function syncRepoMenu () {
-	echo -e "config menu for sync"
+	if [[ $shellInTargetDir -eq 0 ]]; then
+		echo -e "Fine. We will see to what and how you can sync"
+	fi
 }
 
 function syncRepo () {
@@ -163,14 +176,16 @@ function configureBuild() {
 	echo -e "Repo sync before starting the build? : repoSyncBeforeBuild :  \c" && read repoSyncBeforeBuild
 	if [[ $repoSyncBeforeBuild == 0 || $repoSyncBeforeBuild == 1 ]]; then
 		if (test $repoSyncBeforeBuild = "1"); then 
-		cd .. 
-		cd .repo/local_manifests 
-		if [ -f "roomservice.xml" ]; then
-		rm -f roomservice.xml
-		fi
-		cd ..
-		cd ..
-		cd io_build 
+			if [[ $shellInTargetDir -eq 1 ]]; then
+				cd .. 
+				cd .repo/local_manifests 
+				if [ -f "roomservice.xml" ]; then
+				rm -f roomservice.xml
+				fi
+				cd ..
+				cd ..
+				cd io_build 
+			fi
 		echo -e ""
 		fi
 	else
@@ -347,6 +362,7 @@ function defconfig {
 	makeApp=0
 	buildEnvSetup=0
 	cherrypick=0
+	shellInTargetDir=0
 
 	#Restore Green
 	tput sgr0
@@ -364,6 +380,7 @@ function processMenu() {
 		6) exit ;;
 		7) export buildEnvSetup=0 ;;
 		8) export buildEnvSetup=1 ;;
+		12) export shellInTargetDir=1 ;;
 		99) defconfig ;; #Reset to default settings
 		*) echo "  Invalid Option! ERROR!" ;;
 	esac
