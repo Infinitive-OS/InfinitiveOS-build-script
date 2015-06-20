@@ -98,6 +98,7 @@ function currentConfig () {
 	else
 		mode=Default
 		return 1
+	fi
 }
 
 function syncRepo () {
