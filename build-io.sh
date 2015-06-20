@@ -49,7 +49,9 @@ function displayMainMenu() {
 	echo -e "  2. Configure Build parameters"
 	echo -e "  3. Set-up current Target device"
 	echo -e "  4. Configure Cherry-pick script"
+	if( test $device != "generic"); then 
 	echo -e "  5. Build InfinitiveOS for $device"
+	fi
 	echo -e "  6. Exit"
 	echo -e ""
 	echo -e "  Enter choice : \c"
