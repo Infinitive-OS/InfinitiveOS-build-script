@@ -175,7 +175,6 @@ function configureBuild() {
 	if [[ $repoSyncBeforeBuild == 0 || $repoSyncBeforeBuild == 1 ]]; then
 		if (test $repoSyncBeforeBuild = "1"); then 
 			if [[ $shellInTargetDir -eq 1 ]]; then
-				cd .. 
 				cd .repo/local_manifests 
 				if [ -f "roomservice.xml" ]; then
 				rm -f roomservice.xml
