@@ -47,6 +47,7 @@ function displayMainMenu() {
 	currentConfig
 	echo -e "  1. Sync InfinitiveOS Repo"
 	echo -e "  2. Configure Build parameters"
+	echo -e "     2a. Reset All configurations"
 	if [[ $shellInTargetDir -eq 1 ]]; then
 		echo -e "  3. Set-up current Target device"
 		echo -e "  4. Configure Cherry-pick script"
@@ -369,6 +370,7 @@ function processMenu() {
 	case $mainMenuChoice in
 		1) syncRepo ;;
 		2) configureBuild ;;
+		2a) defconfig ;;
 		3) DeviceTarget;;
 		4) cherrypick;;
 		5) build ;;
