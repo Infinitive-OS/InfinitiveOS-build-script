@@ -90,18 +90,13 @@ function currentConfig () {
 	echo -e ""
 	tput sgr0
 	tput setaf 2
-
-	#if [[ $MakeClean != 1 || $MakeClobber != 0 || $MakeInstallClean != 1 || $RepoSyncBeforeBuild != 1 || $buildEnvSetup != 1 ]]; then
-	#	mode=Custom
-	#	echo -e "  Defconfig changed. \n"
-	#	echo -e "  Switched to custom mode."
-	#fi
-}
-
-function syncRepoMenu () {
-	if [[ $shellInTargetDir -eq 0 ]]; then
-		echo -e "Fine. We will see to what and how you can sync"
-	fi
+	if [[ $MakeClean -ne 1 || $MakeClobber -ne 0 || $MakeInstallClean -ne 1 || $RepoSyncBeforeBuild -ne 1 || $buildEnvSetup -ne 1 ]]; then
+		mode=Custom
+		echo -e "  Defconfig changed. \n"
+		echo -e "  Switched to custom mode."
+	else
+		mode=Default
+		return 1
 }
 
 function syncRepo () {
