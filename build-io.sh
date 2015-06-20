@@ -158,13 +158,21 @@ function configureBuild() {
 	echo -e "ERROR! Wrong parameters passed. Reconfigure"
 	configureBuild
 	fi
-
-	echo -e "Use cherry-pick script before starting the build : cherrypick :  \c" && read cherrypick
-	if [[ $cherrypick == 0 || $cherrypick == 1 ]]; then
-		echo -e ""
-	else
-	echo -e " ERROR! Wrong parameters passed. Reconfigure"
-	configureBuild
+	
+	if (test $device = "generic"); then 
+	echo -e "Skipping cherrypick parameter because the target device is generic" 	
+	else 	
+		if [ -f "cherry_$device.sh" ]; then 
+		echo -e "Use cherry-pick script before starting the build for the $device device? : cherrypick :  \c" && read cherrypick
+			if [[ $cherrypick == 0 || $cherrypick == 1 ]]; then
+			echo -e ""
+			else
+			echo -e " ERROR! Wrong parameters passed. Reconfigure"
+			configureBuild
+			fi
+		else 
+		echo -e "Sorry but no cherry_$device.sh was found, try maybe to reconfigure the cherry script and come back here after"
+		fi
 	fi
 
 }
@@ -228,7 +236,9 @@ function DeviceTarget() {
 	cd ..	
 	cd .repo
 	mkdir local_manifests
+	cd local_manifests 
 	nano local_manifest.xml
+	cd ..
 	cd ..
 	cd io_build
 	echo -e "Press enter when you finished editing the local_manifest"
