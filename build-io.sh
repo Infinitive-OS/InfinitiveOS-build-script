@@ -106,7 +106,14 @@ function syncRepo () {
 		echo -e ""
 		x-terminal-emulator -e ./dependencies.sh 
 	fi
-
+		cd .. 
+		cd .repo/local_manifests 
+		if [ -f "roomservice.xml" ]; then
+		rm -f roomservice.xml
+		fi
+		cd ..
+		cd ..
+		cd io_build
 	echo -e ""
 	echo -e "  Press any key to continue after the upgrade is completed "
 	echo -e ""
@@ -155,7 +162,17 @@ function configureBuild() {
 
 	echo -e "Repo sync before starting the build? : repoSyncBeforeBuild :  \c" && read repoSyncBeforeBuild
 	if [[ $repoSyncBeforeBuild == 0 || $repoSyncBeforeBuild == 1 ]]; then
+		if (test $repoSyncBeforeBuild = "1"); then 
+		cd .. 
+		cd .repo/local_manifests 
+		if [ -f "roomservice.xml" ]; then
+		rm -f roomservice.xml
+		fi
+		cd ..
+		cd ..
+		cd io_build 
 		echo -e ""
+		fi
 	else
 	echo -e "ERROR! Wrong parameters passed. Reconfigure"
 	configureBuild
