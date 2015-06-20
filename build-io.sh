@@ -47,7 +47,7 @@ function displayMainMenu() {
 	currentConfig
 	echo -e "  1. Sync InfinitiveOS Repo"
 	echo -e "  2. Configure Build parameters"
-	echo -e "     2a. Reset All configurations"
+	echo -e "  2a. Reset All configurations"
 	if [[ $shellInTargetDir -eq 1 ]]; then
 		echo -e "  3. Set-up current Target device"
 		echo -e "  4. Configure Cherry-pick script"
@@ -58,9 +58,9 @@ function displayMainMenu() {
 	echo -e "  6. Exit"
 	echo -e ""
 	if [[ $shellInTargetDir -eq 0 ]]; then
-		echo -e "   shellInTargetDir is set to False. "
-		echo -e "      if the shell is in same directory as the InfinitiveOS ROM sources. Press 12"
-		echo -e "         Else press 1 to sync InfinitiveOS ROM sources"
+		echo -e " NOTE:  shellInTargetDir is set to False. "
+		echo -e " 	if the shell is in same directory as the InfinitiveOS ROM sources. Press 12"
+		echo -e " 	Else press 1 to sync InfinitiveOS ROM sources"
 		echo -e ""
 	fi
 	echo -e "  Enter choice : \c"
@@ -76,7 +76,7 @@ function currentConfig () {
 	echo -e ""
 	tput bold 
 	tput setaf 6
-	echo -e "Shell Options:"
+	echo -e " Shell Options:"
 	echo -e " shellInTargetDir    :     $shellInTargetDir"
 	echo -e ""
 	echo -e " Enviornment options: "
@@ -115,19 +115,20 @@ function syncRepo () {
 		echo -e "   > Running the dependencies script"
 		echo -e ""
 		x-terminal-emulator -e ./dependencies.sh 
+		echo -e ""
+	echo -e "  Press any key to continue after the upgrade is completed "
+	echo -e ""
+	read blank
 	fi
+		if [[ $shellInTargetDir -eq 1 ]]; then
 		cd .. 
 		cd .repo/local_manifests 
 		if [ -f "roomservice.xml" ]; then
 		rm -f roomservice.xml
 		fi
+		fi
 		cd ..
 		cd ..
-		cd io_build
-	echo -e ""
-	echo -e "  Press any key to continue after the upgrade is completed "
-	echo -e ""
-	read blank
 
 	syncRepoMenu
 }
@@ -181,7 +182,6 @@ function configureBuild() {
 				fi
 				cd ..
 				cd ..
-				cd io_build 
 			fi
 		echo -e ""
 		fi
@@ -218,9 +218,7 @@ function DeviceTarget() {
 	echo -e "Build environment already initialized skipping..."
 	else 
 	buildEnvSetup=1
-	cd ..
 	source build/./envsetup.sh
-	cd io_build
 	fi
 	clear
 	echo -e "Official Devices"
@@ -261,7 +259,7 @@ function DeviceTarget() {
 	else
 	echo -e "Going to build for an unofficial device, and you already set-up your device tree?"
 	read undevice
-	if [[ $dundevice == 0 || $undevice == 1 ]]; then
+	if [[ $undevice == 0 || $undevice == 1 ]]; then
 	echo -e ""
 	else
 	echo -e " ERROR! Wrong parameters passed. Reconfigure"
@@ -270,21 +268,16 @@ function DeviceTarget() {
 		if (test $undevice = "1"); then
 		echo -e "Insert your device codename then, in order to make it as current target"
 		read device
-		cd ..
-		source build/./envsetup.sh
-		cd io_build
 		breakfast $device
 	else	
 	echo -e "If your device is not listed you will gonna need to insert the repos to fetch in the local manifest"
 	sleep 2
-	cd ..	
 	cd .repo
-	mkdir local_manifests
+	mkdir -p local_manifests
 	cd local_manifests 
 	nano local_manifest.xml
 	cd ..
 	cd ..
-	cd io_build
 	echo -e "Press enter when you finished editing the local_manifest"
 	read blank
 	echo -e "Going to repo sync now, in order to include the repo from the local_manifest"
@@ -292,9 +285,6 @@ function DeviceTarget() {
 	clear
 	echo -e "Now, you just have to type the codename of your device :)"
 	read device
-	cd ..
-	source build/./envsetup.sh
-	cd io_build
 	breakfast $device
 	clear
 	echo -e "Breakfast completed, ROM build is set now for the $device device"
