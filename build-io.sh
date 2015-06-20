@@ -198,8 +198,19 @@ function configureBuild() {
 
 function DeviceTarget() {
 	
+	clear
 	tput sgr0
 	tput setaf 4
+	echo -e "Checking if the build environment is initialized.."
+	if (test $buildEnvSetup = "1"); then
+	echo -e "Build environment already initialized skipping..."
+	else 
+	buildEnvSetup=1
+	cd ..
+	source build/./envsetup.sh
+	cd io_build
+	fi
+	clear
 	echo -e "Official Devices"
 	echo -e ""
 	echo -e ""
@@ -224,25 +235,27 @@ function DeviceTarget() {
 	echo -e "Is your device in one of the listed ones?"
 	echo -e "Insert 1 or 0"
 	read devicetargetchoice
+	if [[ $devicetargetchoice == 0 || $devicetargetchoice == 1 ]]; then
+	echo -e ""
+	else
+	echo -e " ERROR! Wrong parameters passed. Reconfigure"
+	DeviceTarget
+	fi
 	if (test $devicetargetchoice = "1"); then
-	echo -e "Checking if the build environment is initialized.."
-		if (test $buildEnvSetup = "1"); then
-		echo -e "Build environment already initialized skipping..."
-		else 
-		$buildEnvSetup=1
-		fi
-	echo -e "Insert the codename of the device which you will gonna build to:"
+	echo -e "Insert the codename of the device which you will gonna build for:"
 	read device
-	cd ..
-	source build/./envsetup.sh
-	cd io_build
 	echo -e "Going to make Breakfast for the $device device"
-	
 	breakfast $device
 	else
 	echo -e "Going to build for an unofficial device, and you already set-up your device tree?"
 	read undevice
-		if(test $undevice = "1"); then
+	if [[ $dundevice == 0 || $undevice == 1 ]]; then
+	echo -e ""
+	else
+	echo -e " ERROR! Wrong parameters passed. Reconfigure"
+	DeviceTarget
+	fi
+		if (test $undevice = "1"); then
 		echo -e "Insert your device codename then, in order to make it as current target"
 		read device
 		cd ..
@@ -332,7 +345,7 @@ function defconfig {
 	makeInstallClean=0
 	repoSyncBeforeBuild=1
 	makeApp=0
-	buildEnvSetup=1
+	buildEnvSetup=0
 	cherrypick=0
 
 	#Restore Green
