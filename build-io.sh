@@ -95,17 +95,18 @@ function currentConfig () {
 	echo -e " makeClobber         :     $makeClobber"
 	echo -e " makeInstallClean    :     $makeInstallClean"
 	echo -e " repoSyncBeforeBuild :     $repoSyncBeforeBuild"
+	echo -e ""
+	echo -e " Target device options: "
 	echo -e " cherrypick          :     $cherrypick"
 	echo -e ""
 	tput sgr0
 	tput setaf 2
-	if [[ $MakeClean -ne 1 || $MakeClobber -ne 0 || $MakeInstallClean -ne 1 || $RepoSyncBeforeBuild -ne 1 || $buildEnvSetup -ne 1 ]]; then
-		mode=Custom
-		echo -e "  Defconfig changed. \n"
-		echo -e "  Switched to custom mode."
-	else
+	if [[ $makeClean != "1" || $makeClobber != "0" || $makeInstallClean != "0"  || $repoSyncBeforeBuild != "1" || $buildEnvSetup != "0" || $cherrypick != "0" ]]; then
+		echo -e "  Defconfig changed."
+		echo -e "  Switched to custom mode. \n"
 		mode=Default
-		return 1
+	else			
+		mode=Custom
 	fi
 }
 
@@ -343,7 +344,7 @@ function defconfig {
 
 	echo -e "  Loading defaults..\n"
 
-	mode=default
+	mode=Default
 
 	tput sgr0
 	tput setaf 1
