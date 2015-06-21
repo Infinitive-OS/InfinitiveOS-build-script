@@ -44,36 +44,28 @@ function displayMainMenu() {
 	echo -e "  *************************************"
 	echo -e "	  Target Device: io_$device     "
 	echo -e "  *************************************"
-	if [[ $shellInTargetDir -eq 0 ]]; then
-	echo -e "  100. Prepare InfinitiveOS Repo"
-	else
 	currentConfig
 	echo -e "  1. Sync InfinitiveOS Repo"
 	echo -e "  2. Configure Build parameters"
 	echo -e "  2a. Reset All configurations"
-	echo -e "  3. Set-up current Target device"
-	echo -e "  4. Configure Cherry-pick script"
-	if( test $device != "generic"); then 
-	echo -e "  5. Build InfinitiveOS for $device"
-	fi
+	if [[ $shellInTargetDir -eq 1 ]]; then
+		echo -e "  3. Set-up current Target device"
+		echo -e "  4. Configure Cherry-pick script"
+		if( test $device != "generic"); then 
+		echo -e "  5. Build InfinitiveOS for $device"
+		fi
 	fi
 	echo -e "  6. Exit"
 	echo -e ""
 	if [[ $shellInTargetDir -eq 0 ]]; then
 		echo -e " NOTE:  shellInTargetDir is set to False. "
-		echo -e " 	If the shell is in same directory as the InfinitiveOS ROM sources, press 12"
-		echo -e " 	Else press 100 to prepare the InfinitiveOS ROM sources"
+		echo -e " 	if the shell is in same directory as the InfinitiveOS ROM sources. Press 12"
+		echo -e " 	Else press 1 to sync InfinitiveOS ROM sources"
 		echo -e ""
 	fi
 	echo -e "  Enter choice : \c"
 	read mainMenuChoice
 	processMenu $mainMenuChoice
-}
-
-function Repoinit () {
-
-echo -e "Needs work around here"
-
 }
 
 function currentConfig () {
@@ -183,7 +175,7 @@ function configureBuild() {
 	echo -e "Repo sync before starting the build? : repoSyncBeforeBuild :  \c" && read repoSyncBeforeBuild
 	if [[ $repoSyncBeforeBuild == 0 || $repoSyncBeforeBuild == 1 ]]; then
 		if (test $repoSyncBeforeBuild = "1"); then 
-			if [[ $shellInTargetDir -eq 1 ]]; then 
+			if [[ $shellInTargetDir -eq 1 ]]; then
 				cd .repo/local_manifests 
 				if [ -f "roomservice.xml" ]; then
 				rm -f roomservice.xml
@@ -367,18 +359,17 @@ function defconfig {
 
 function processMenu() {
 	case $mainMenuChoice in
-		1) syncRepo;;
+		1) syncRepo ;;
 		2) configureBuild ;;
-	       2a) defconfig ;;
+		2a) defconfig ;;
 		3) DeviceTarget;;
 		4) cherrypick;;
 		5) build ;;
 		6) exit ;;
 		7) export buildEnvSetup=0 ;;
 		8) export buildEnvSetup=1 ;;
-	       12) export shellInTargetDir=1 ;;
-	       99) defconfig ;; #Reset to default settings
-	      100) Repoinit  ;; 
+		12) export shellInTargetDir=1 ;;
+		99) defconfig ;; #Reset to default settings
 		*) echo "  Invalid Option! ERROR!" ;;
 	esac
 	echo -e " Press any key to continue..."
