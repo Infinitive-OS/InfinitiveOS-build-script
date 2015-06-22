@@ -24,7 +24,7 @@ bldcya=${txtbld}$(tput setaf 6) # Bold cyan
 normal='tput sgr0'
 
 
-function io_main_splash () {
+function IO_MAINSPLASH () {
 	tput bold
 	tput setaf 2 
 	echo -e "   .___        _____.__       .__  __  .__             ________    _________"
@@ -38,7 +38,7 @@ function io_main_splash () {
 	tput setaf 2
 }
 
-function currentConfig () {
+function CURRENT_CONFIG () {
 	echo -e " "
 	echo -e "  NOTE : We are using Binary inputs"
 	echo -e "  1 for Yes "
@@ -60,7 +60,7 @@ function currentConfig () {
 	tput sgr0
 	tput setaf 2
 	if [[ $MAKE_CLEAN != "1" || $MAKE_CLOBBER != "0" || $MAKE_INSTALLCLEAN != "0"  || $REPO_SYNC_BEFORE_BUILD != "1" || $BUILD_ENV_SETUP != "0" || $CHERRYPICK != "0" ]]; then
-		echo -e "  Defconfig changed."
+		echo -e "  DEFCONFIG changed."
 		echo -e "  Switched to custom mode. \n"
 		mode=Default
 	else			
@@ -74,16 +74,14 @@ function displayMainMenu() {
 		echo -e "	  TARGET_PRODUCT: $TARGET_PRODUCT   "
 		echo -e "  *************************************"
 	fi
-	currentConfig
+	CURRENT_CONFIG
 	echo -e "  1. Sync InfinitiveOS Repo"
 	echo -e "  2. Configure Build parameters"
 	echo -e "  2a. Reset All configurations"
 	if [[ $SHELL_IN_TARGET_DIR -eq 1 ]]; then
 		echo -e "  3. Set-up current Target device"
 		echo -e "  4. Configure Cherry-pick script"
-		if( test $device != "generic"); then 
 		echo -e "  5. Build InfinitiveOS for $device"
-		fi
 	fi
 	echo -e "  6. Exit"
 	echo -e ""
@@ -95,22 +93,22 @@ function displayMainMenu() {
 	fi
 	echo -e "  Enter choice : \c"
 	read mainMenuChoice
-	processMenu $mainMenuChoice
+	PROCESS_MENU $mainMenuChoice
 }
 
-function processMenu() {
+function PROCESS_MENU() {
 	case $mainMenuChoice in
-		1) syncRepo ;;
-		2) configureBuild ;;
-		2a) defconfig ;;
+		1) REPO_SYNC ;;
+		2) CONFIGURE_BUILD_OPTIONS ;;
+		2a) DEFCONFIG ;;
 		3) DeviceTarget;;
 		4) CHERRYPICK;;
-		5) build ;;
+		5) BUILD ;;
 		6) exit ;;
 		7) export BUILD_ENV_SETUP=0 ;;
 		8) export BUILD_ENV_SETUP=1 ;;
 		12) export SHELL_IN_TARGET_DIR=1 ;;
-		99) defconfig ;; #Reset to default settings
+		99) DEFCONFIG ;; #Reset to default settings
 		*) echo "  Invalid Option! ERROR!" ;;
 	esac
 	echo -e " Press any key to continue..."
@@ -118,40 +116,78 @@ function processMenu() {
 	clear
 }
 
-function syncRepo () {
-	echo -e ""
-	echo -e " Lets sync something here ( get set to shed your gbs ;) )"
-	echo -e ""
+function REPO_SYNC () {
 
-	echo -e "${bldcya}>>   Would you like us to upgrade and check for dependencies to avoid errors while building? \n"
-	echo -e "${bldcya}    (yes/no) \c"
-	tput sgr0
-	tput setaf 2
-	read askDependencies
-	if [[ $askDependencies = "yes" || $askDependencies = "Yes" || $askDependencies = "YES" ]]; then
-		echo -e ""
-		echo -e "   > Running the dependencies script"
-		echo -e ""
-		x-terminal-emulator -e ./dependencies.sh 
-		echo -e ""
-	echo -e "  Press any key to continue after the upgrade is completed "
-	echo -e ""
-	read blank
-	fi
-		if [[ $SHELL_IN_TARGET_DIR -eq 1 ]]; then
-		cd .. 
-		cd .repo/local_manifests 
-		if [ -f "roomservice.xml" ]; then
-		rm -f roomservice.xml
-		fi
-		fi
-		cd ..
-		cd ..
-
-	syncRepoMenu
+	REPO_SYNC_QUESTIONNAIRE
+	REPO_SYNCMENU
 }
 
-function configureBuild() {
+function REPO_SYNC_QUESTIONNAIRE {
+	PACKAGES="git gnupg ccache lzop libglapi-mesa-lts-utopic:i386 libgl1-mesa-dri-lts-utopic:i386 flex bison gperf build-essential zip curl zlib1g-dev zlib1g-dev:i386 libc6-dev lib32bz2-1.0 lib32ncurses5-dev x11proto-core-dev libx11-dev:i386 libreadline6-dev:i386 lib32z1-dev libgl1-mesa-glx-lts-utopic:i386 libgl1-mesa-dev-lts-utopic g++-multilib mingw32 tofrodos python-markdown libxml2-utils xsltproc libreadline6-dev lib32readline-gplv2-dev libncurses5-dev bzip2 libbz2-dev libbz2-1.0 libghc-bzlib-dev lib32bz2-dev squashfs-tools pngcrush schedtool dpkg-dev"
+ 	echo -e " Checking for required packages for building InfinitiveOS..."
+	sleep 1.5
+	for program in $PACKAGES ; do
+	 	program_status=`which $program`
+ 		if [[ -n $program_status ]]; then
+ 			echo "$program_status is NOT installed"
+			sudo apt-get install $program 
+		else
+			echo -e "$program is installed"
+ 		fi
+ 	done
+
+ 	sleep 1
+
+ 	echo -e ""
+ 	echo -e "Checking for java version"
+ 	JAVA_VER=$(java -version 2>&1 | sed 's/java version "\(.*\)\.\(.*\)\..*"/\1\2/; 1q')
+ 	if [[ $JAVA_VER -ge 17 ]]; then
+ 		echo -e "Found java version 1.7 or newer."
+ 	else
+ 		sudo -u ${USERNAME} apt-get purge openjdk-\* icedtea-\* icedtea6-\*
+		sudo -u ${USERNAME} apt-get update && sudo apt-get install openjdk-7-jdk
+ 	fi
+
+ 	echo -e ""
+ 	echo -e "Is your build environment setup for building android?"
+ 	echo -e "if you dont know what it means, its better to say 0 (no)"
+ 	echo -e "1 for Yes, and 0 for no : \c"
+ 	read BUILD_ENV_SETUP
+
+	
+ 	if [[ $BUILD_ENV_SETUP -ne 1 ]]; then
+ 		echo -e "Settings up repo.."
+		sudo -u ${USERNAME} ln -s /usr/lib/i386-linux-gnu/mesa/libGL.so.1 /usr/lib/i386-linux-gnu/libGL.so
+		mkdir ~/bin && curl http://commondatastorage.googleapis.com/git-repo-downloads/repo > ~/bin/repo && chmod a+x ~/bin/repo
+		echo 'export PATH=~/bin:$PATH' | sudo tee --append ~/.bashrc
+		source ~/.bashrc
+		echo -e "Please enter your email id for Git config : \c"
+		read uemail
+		git config --global user.email "$uemail"
+		echo -e "Please enter your name for Git config : \c"
+		read uname
+		git config --global user.name "$uname"
+ 	fi
+
+ 	echo -e "Do you want to initialize and sync InfinitiveOS?"
+ 	echo -e "		This involes, init-ing the repo and syncing all from scratch. This might take a large amount of bandwidth."
+ 	echo -e "1 for Yes, and 0 for no : \c"
+ 	read INIT_AND_SYNC
+ 	echo "$INIT_AND_SYNC"
+
+	if [[ $SHELL_IN_TARGET_DIR -ne 1 ]]; then
+	 	if [[ $INIT_AND_SYNC -eq 1 ]]; then
+	 		echo "Beginning to initialize and Sync InfinitiveOS...."
+	 		echo " This may take a while.."
+	 		mkdir ./InfinitiveOS
+	 		cd ./InfinitiveOS
+	 		repo init -u https://github.com/InfinitiveOS/platform_manifest -b io-1.0
+	 		repo sync
+ 		fi
+	fi
+}
+
+function CONFIGURE_BUILD_OPTIONS() {
 	echo -e "begining to edit the default build options."
 	echo -e "      "
 	echo -e "     | Submit values in binary bits"
@@ -162,7 +198,7 @@ function configureBuild() {
 		echo -e ""
 	else
 	echo -e "ERROR! Wrong parameters passed. Reconfigure"
-	configureBuild
+	CONFIGURE_BUILD_OPTIONS
 	fi
 
 	echo -e "Make clean before starting the build? : MAKE_CLEAN :  \c" && read MAKE_CLEAN
@@ -170,7 +206,7 @@ function configureBuild() {
 		echo -e ""
 	else
 	echo -e "ERROR! Wrong parameters passed. Reconfigure"
-	configureBuild
+	CONFIGURE_BUILD_OPTIONS
 	fi
 
 	echo -e "Make clobber before starting the build? : MAKE_CLOBBER :  \c" && read MAKE_CLOBBER
@@ -178,7 +214,7 @@ function configureBuild() {
 		echo -e ""
 	else
 	echo -e "ERROR! Wrong parameters passed. Reconfigure"
-	configureBuild
+	CONFIGURE_BUILD_OPTIONS
 	fi
 
 	echo -e "Make InstallClean before starting the build? : MAKE_INSTALLCLEAN :  \c" && read MAKE_INSTALLCLEAN
@@ -186,7 +222,7 @@ function configureBuild() {
 		echo -e ""
 	else
 	echo -e "ERROR! Wrong parameters passed. Reconfigure"
-	configureBuild
+	CONFIGURE_BUILD_OPTIONS
 	fi
 
 	echo -e "Repo sync before starting the build? : REPO_SYNC_BEFORE_BUILD :  \c" && read REPO_SYNC_BEFORE_BUILD
@@ -204,7 +240,7 @@ function configureBuild() {
 		fi
 	else
 	echo -e "ERROR! Wrong parameters passed. Reconfigure"
-	configureBuild
+	CONFIGURE_BUILD_OPTIONS
 	fi
 	
 	if (test $device = "generic"); then 
@@ -216,7 +252,7 @@ function configureBuild() {
 			echo -e ""
 			else
 			echo -e " ERROR! Wrong parameters passed. Reconfigure"
-			configureBuild
+			CONFIGURE_BUILD_OPTIONS
 			fi
 		else 
 		echo -e "Sorry but no cherry_$device.sh was found, try maybe to reconfigure the cherry script and come back here after"
@@ -342,11 +378,11 @@ function CHERRYPICK() {
 	fi 
 }    
 
-function build () {
+function BUILD () {
 	echo -e " *holds tiki torch and dances*"
 }
 
-function defconfig {
+function DEFCONFIG {
 	# Red
 	tput setaf 1
 	tput bold
@@ -375,10 +411,10 @@ function defconfig {
 }
 
 #Load default configurations
-defconfig
+DEFCONFIG
 
 while [[ true ]]; do
-	io_main_splash
+	IO_MAINSPLASH
 	displayMainMenu
 done
 
