@@ -182,6 +182,17 @@ function REPO_SYNC_QUESTIONNAIRE {
 	 		mkdir ./InfinitiveOS
 	 		cd ./InfinitiveOS
 	 		repo init -u https://github.com/InfinitiveOS/platform_manifest -b io-1.0
+ 			echo -e "Does your device has a local_manifest?"
+ 			echo -e "1 for Yes, and 0 for no : \c"	 		
+	 		read $HAS_LOCAL_MANIFEST
+	 		if [[ $HAS_LOCAL_MANIFEST -eq 1 ]]; then
+	 			mkdir .repo/local_manifest
+	 			echo "Paste your local manifest in the file that will now open"
+	 			echo "After pasting, press ctrl+o followed by ctrl+x , to save and exit the file."
+	 			echo "Make sure you have all your Remotes and revisions set according else sync might fail. ; \c"
+	 			read blank
+	 			nano .repo/local_manifest/local.xml
+	 		fi
 	 		repo sync
  		fi
 	fi
