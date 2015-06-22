@@ -75,13 +75,20 @@ function displayMainMenu() {
 		echo -e "  *************************************"
 	fi
 	CURRENT_CONFIG
+	echo -e "  0. TARGET_PRODUCT"
+	echo -e "			Enter the TARGET_DEVICE's codename"
+	echo -e ""
 	echo -e "  1. Sync InfinitiveOS Repo"
+	echo -e "			Setup android Build environment"
+	echo -e "			Initialize and Sync InfinitiveOS"
+	echo -e ""
 	echo -e "  2. Configure Build parameters"
-	echo -e "  2a. Reset All configurations"
+	echo -e "			Update configurations"
+	echo -e ""
+	echo -e "  	  2a. Reset All configurations"
 	if [[ $SHELL_IN_TARGET_DIR -eq 1 ]]; then
-		echo -e "  3. Set-up current Target device"
-		echo -e "  4. Configure Cherry-pick script"
-		echo -e "  5. Build InfinitiveOS for $device"
+		echo -e "  3. Set-up $TARGET_PRODUCT"
+		echo -e "  4. Build InfinitiveOS for $device"
 	fi
 	echo -e "  6. Exit"
 	echo -e ""
@@ -98,17 +105,14 @@ function displayMainMenu() {
 
 function PROCESS_MENU() {
 	case $mainMenuChoice in
+		0) echo "Enter TARGET_PRODUCT " && read TARGET_PRODUCT ;;
 		1) REPO_SYNC ;;
 		2) CONFIGURE_BUILD_OPTIONS ;;
 		2a) DEFCONFIG ;;
-		3) DeviceTarget;;
-		4) CHERRYPICK;;
-		5) BUILD ;;
+		3) SETUP_BUILD ;;
+		4) BUILD ;;
 		6) exit ;;
-		7) export BUILD_ENV_SETUP=0 ;;
-		8) export BUILD_ENV_SETUP=1 ;;
 		12) export SHELL_IN_TARGET_DIR=1 ;;
-		99) DEFCONFIG ;; #Reset to default settings
 		*) echo "  Invalid Option! ERROR!" ;;
 	esac
 	echo -e " Press any key to continue..."
@@ -116,13 +120,7 @@ function PROCESS_MENU() {
 	clear
 }
 
-function REPO_SYNC () {
-
-	REPO_SYNC_QUESTIONNAIRE
-	REPO_SYNCMENU
-}
-
-function REPO_SYNC_QUESTIONNAIRE {
+function REPO_SYNC {
 	PACKAGES="git gnupg ccache lzop libglapi-mesa-lts-utopic:i386 libgl1-mesa-dri-lts-utopic:i386 flex bison gperf build-essential zip curl zlib1g-dev zlib1g-dev:i386 libc6-dev lib32bz2-1.0 lib32ncurses5-dev x11proto-core-dev libx11-dev:i386 libreadline6-dev:i386 lib32z1-dev libgl1-mesa-glx-lts-utopic:i386 libgl1-mesa-dev-lts-utopic g++-multilib mingw32 tofrodos python-markdown libxml2-utils xsltproc libreadline6-dev lib32readline-gplv2-dev libncurses5-dev bzip2 libbz2-dev libbz2-1.0 libghc-bzlib-dev lib32bz2-dev squashfs-tools pngcrush schedtool dpkg-dev"
  	echo -e " Checking for required packages for building InfinitiveOS..."
 	sleep 1.5
@@ -253,144 +251,21 @@ function CONFIGURE_BUILD_OPTIONS() {
 	echo -e "ERROR! Wrong parameters passed. Reconfigure"
 	CONFIGURE_BUILD_OPTIONS
 	fi
-	
-	if (test $device = "generic"); then 
-	echo -e "Skipping CHERRYPICK parameter because the target device is generic" 	
-	else 	
-		if [ -f "cherry_$device.sh" ]; then 
-		echo -e "Use cherry-pick script before starting the build for the $device device? : CHERRYPICK :  \c" && read CHERRYPICK
-			if [[ $CHERRYPICK == 0 || $CHERRYPICK == 1 ]]; then
-			echo -e ""
-			else
-			echo -e " ERROR! Wrong parameters passed. Reconfigure"
-			CONFIGURE_BUILD_OPTIONS
+
+}	
+
+function SETUP_BUILD () {
+	if [[ -n $TARGET_PRODUCT ]]; then
+		echo -e "checking if official or not"
+		OFFICIAL_DEVICES="ariesve,I9082,kmini3g,s3ve3g,titan,falcon,condor,taoshan,yuga,honami,togari,leo,armani,cancro,tomato"
+		for OFFICIAL_DEVICE in $OFFICIAL_DEVICES; do
+			if [[ ${TARGET_PRODUCT} == ${OFFICIAL_DEVICE} ]]; then
+				export IO_BUILDTYPE=OFFICIAL
+				echo -e "$TARGET_PRODUCT is an OFFICIAL InfinitiveOS device"
+				echo -e "Building as official"
 			fi
-		else 
-		echo -e "Sorry but no cherry_$device.sh was found, try maybe to reconfigure the cherry script and come back here after"
-		fi
+		done
 	fi
-
-}
-
-function DeviceTarget() {
-	
-	clear
-	tput sgr0
-	tput setaf 4
-	echo -e "Checking if the build environment is initialized.."
-	if (test $BUILD_ENV_SETUP = "1"); then
-	echo -e "Build environment already initialized skipping..."
-	else 
-	BUILD_ENV_SETUP=1
-	source build/./envsetup.sh
-	fi
-	clear
-	echo -e "Official Devices"
-	echo -e ""
-	echo -e ""
-	echo -e "Samsung Galaxy S+ (ariesve)"
-	echo -e "Samsung Galaxy Grand Duos (I9082)"
-	echo -e "Samsung Galaxy S5 Mini (kmini3g)"
-	echo -e "Samsung Galaxy S3 Neo (s3ve3g)"
-	echo -e "Motorola Moto G 2014 (titan)"
-	echo -e "Motorola Moto G (falcon)"
-	echo -e "Motorola Moto E (condor)"
-	echo -e "Sony Xperia L (taoshan)"
-	echo -e "Sony Xperia Z (yuga)"
-	echo -e "Sony Xperia Z2 (honami)"
-	echo -e "Sony Xperia Z3 (leo)"
-	echo -e "Xiaomi Redmi 1S (armani)"
-	echo -e "Xiaomi Mi3 (cancro)"
-	echo -e "Yu Yureka (tomato)"
-	echo -e ""
-	echo -e ""
-	sleep 1
-	tput setaf 2
-	echo -e "Is your device in one of the listed ones?"
-	echo -e "Insert 1 or 0"
-	read devicetargetchoice
-	if [[ $devicetargetchoice == 0 || $devicetargetchoice == 1 ]]; then
-	echo -e ""
-	else
-	echo -e " ERROR! Wrong parameters passed. Reconfigure"
-	DeviceTarget
-	fi
-	if (test $devicetargetchoice = "1"); then
-	echo -e "Insert the codename of the device which you will gonna build for:"
-	read device
-	echo -e "Going to make Breakfast for the $device device"
-	breakfast $device
-	else
-	echo -e "Going to build for an unofficial device, and you already set-up your device tree?"
-	read undevice
-	if [[ $undevice == 0 || $undevice == 1 ]]; then
-	echo -e ""
-	else
-	echo -e " ERROR! Wrong parameters passed. Reconfigure"
-	DeviceTarget
-	fi
-		if (test $undevice = "1"); then
-		echo -e "Insert your device codename then, in order to make it as current target"
-		read device
-		breakfast $device
-	else	
-	echo -e "If your device is not listed you will gonna need to insert the repos to fetch in the local manifest"
-	sleep 2
-	cd .repo
-	mkdir -p local_manifests
-	cd local_manifests 
-	nano local_manifest.xml
-	cd ..
-	cd ..
-	echo -e "Press enter when you finished editing the local_manifest"
-	read blank
-	echo -e "Going to repo sync now, in order to include the repo from the local_manifest"
-	repo sync
-	clear
-	echo -e "Now, you just have to type the codename of your device :)"
-	read device
-	breakfast $device
-	clear
-	echo -e "Breakfast completed, ROM build is set now for the $device device"
-	fi 
-	fi
-	
-	tput sgr0
-}
-	
-
-function CHERRYPICK() {
-	
-	clear
-	tput setaf bold
-	tput setaf 3
-	
-	echo -e "In order to proceed with this operation we need to check if you already choosed a target device"
-	if (test $device != generic); then
-	echo -e "Ok we can proceed..."
-	sleep 2
-	echo -e "Basically this script will be made separately for each device"
-	echo -e "And this script will be used for the developers who need to cherry pick some propietary stuff for the device to compile the ROM"
-	echo -e "And to don't repeat this every time, it's better to do a script from this and run it every time you make a new build for the device"
-	echo -e "I think you already know how cherry-pick works so i won't stay here explain to you how to do that :)"
-	echo -e "You are currently building for $device"
-	
-	echo -e "Press enter when you are ready"
-	read blank
-	
-	nano cherry_$device.sh
-
-	else 
-
-	echo -e "You need to choose a target device first!"
-	sleep 1
-	DeviceTarget
-
-	fi 
-}    
-
-function BUILD () {
-	echo -e " *holds tiki torch and dances*"
 }
 
 function DEFCONFIG {
