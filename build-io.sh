@@ -23,8 +23,6 @@ bldblu=${txtbld}$(tput setaf 4) # Bold blue
 bldcya=${txtbld}$(tput setaf 6) # Bold cyan
 normal='tput sgr0'
 
-# Default Device
-device=generic
 
 function io_main_splash () {
 	tput bold
@@ -71,9 +69,11 @@ function currentConfig () {
 }
 
 function displayMainMenu() {
-	echo -e "  *************************************"
-	echo -e "	  Target Device: io_$device     "
-	echo -e "  *************************************"
+	if [[ -n $TARGET_PRODUCT ]]; then
+		echo -e "  *************************************"
+		echo -e "	  TARGET_PRODUCT: $TARGET_PRODUCT   "
+		echo -e "  *************************************"
+	fi
 	currentConfig
 	echo -e "  1. Sync InfinitiveOS Repo"
 	echo -e "  2. Configure Build parameters"
