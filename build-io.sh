@@ -45,27 +45,23 @@ function currentConfig () {
 	echo -e "  NOTE : We are using Binary inputs"
 	echo -e "  1 for Yes "
 	echo -e "  0 for No "
-	echo -e ""
 	tput bold 
 	tput setaf 6
-	echo -e " Shell Options:"
-	echo -e " shellInTargetDir    :     $shellInTargetDir"
+	echo -e "============================================================"
+	echo -e " SHELL_IN_TARGET_DIR = $SHELL_IN_TARGET_DIR"
 	echo -e ""
-	echo -e " Enviornment options: "
-	echo -e " buildEnvSetup       :     $buildEnvSetup"
+	echo -e " BUILD_ENV_SETUP = $BUILD_ENV_SETUP"
 	echo -e ""
-	echo -e " Make options:"
-	echo -e " makeClean           :     $makeClean"
-	echo -e " makeClobber         :     $makeClobber"
-	echo -e " makeInstallClean    :     $makeInstallClean"
-	echo -e " repoSyncBeforeBuild :     $repoSyncBeforeBuild"
+	echo -e " MAKE_CLEAN = $MAKE_CLEAN"
+	echo -e " MAKE_CLOBBER = $MAKE_CLOBBER"
+	echo -e " MAKE_INSTALLCLEAN = $MAKE_INSTALLCLEAN"
+	echo -e " REPO_SYNC_BEFORE_BUILD = $REPO_SYNC_BEFORE_BUILD"
 	echo -e ""
-	echo -e " Target device options: "
-	echo -e " cherrypick          :     $cherrypick"
-	echo -e ""
+	echo -e " CHERRYPICK = $CHERRYPICK"
+	echo -e "============================================================"
 	tput sgr0
 	tput setaf 2
-	if [[ $makeClean != "1" || $makeClobber != "0" || $makeInstallClean != "0"  || $repoSyncBeforeBuild != "1" || $buildEnvSetup != "0" || $cherrypick != "0" ]]; then
+	if [[ $MAKE_CLEAN != "1" || $MAKE_CLOBBER != "0" || $MAKE_INSTALLCLEAN != "0"  || $REPO_SYNC_BEFORE_BUILD != "1" || $BUILD_ENV_SETUP != "0" || $CHERRYPICK != "0" ]]; then
 		echo -e "  Defconfig changed."
 		echo -e "  Switched to custom mode. \n"
 		mode=Default
@@ -82,7 +78,7 @@ function displayMainMenu() {
 	echo -e "  1. Sync InfinitiveOS Repo"
 	echo -e "  2. Configure Build parameters"
 	echo -e "  2a. Reset All configurations"
-	if [[ $shellInTargetDir -eq 1 ]]; then
+	if [[ $SHELL_IN_TARGET_DIR -eq 1 ]]; then
 		echo -e "  3. Set-up current Target device"
 		echo -e "  4. Configure Cherry-pick script"
 		if( test $device != "generic"); then 
@@ -91,8 +87,8 @@ function displayMainMenu() {
 	fi
 	echo -e "  6. Exit"
 	echo -e ""
-	if [[ $shellInTargetDir -eq 0 ]]; then
-		echo -e " NOTE:  shellInTargetDir is set to False. "
+	if [[ $SHELL_IN_TARGET_DIR -eq 0 ]]; then
+		echo -e " NOTE:  SHELL_IN_TARGET_DIR is set to False. "
 		echo -e " 	if the shell is in same directory as the InfinitiveOS ROM sources. Press 12"
 		echo -e " 	Else press 1 to sync InfinitiveOS ROM sources"
 		echo -e ""
@@ -108,12 +104,12 @@ function processMenu() {
 		2) configureBuild ;;
 		2a) defconfig ;;
 		3) DeviceTarget;;
-		4) cherrypick;;
+		4) CHERRYPICK;;
 		5) build ;;
 		6) exit ;;
-		7) export buildEnvSetup=0 ;;
-		8) export buildEnvSetup=1 ;;
-		12) export shellInTargetDir=1 ;;
+		7) export BUILD_ENV_SETUP=0 ;;
+		8) export BUILD_ENV_SETUP=1 ;;
+		12) export SHELL_IN_TARGET_DIR=1 ;;
 		99) defconfig ;; #Reset to default settings
 		*) echo "  Invalid Option! ERROR!" ;;
 	esac
@@ -126,7 +122,7 @@ function syncRepo () {
 	echo -e ""
 	echo -e " Lets sync something here ( get set to shed your gbs ;) )"
 	echo -e ""
-	
+
 	echo -e "${bldcya}>>   Would you like us to upgrade and check for dependencies to avoid errors while building? \n"
 	echo -e "${bldcya}    (yes/no) \c"
 	tput sgr0
@@ -142,7 +138,7 @@ function syncRepo () {
 	echo -e ""
 	read blank
 	fi
-		if [[ $shellInTargetDir -eq 1 ]]; then
+		if [[ $SHELL_IN_TARGET_DIR -eq 1 ]]; then
 		cd .. 
 		cd .repo/local_manifests 
 		if [ -f "roomservice.xml" ]; then
@@ -161,42 +157,42 @@ function configureBuild() {
 	echo -e "     | Submit values in binary bits"
 	echo -e "     | 1 for Yes, and 0 for No"
 	echo -e ""
-	echo -e "Is you Build enviornment set up? : buildEnvSetup :  \c" && read buildEnvSetup
-	if [[ "$buildEnvSetup" == "0" || "$buildEnvSetup" == "1" ]]; then
+	echo -e "Is you Build enviornment set up? : BUILD_ENV_SETUP :  \c" && read BUILD_ENV_SETUP
+	if [[ "$BUILD_ENV_SETUP" == "0" || "$BUILD_ENV_SETUP" == "1" ]]; then
 		echo -e ""
 	else
 	echo -e "ERROR! Wrong parameters passed. Reconfigure"
 	configureBuild
 	fi
 
-	echo -e "Make clean before starting the build? : MakeClean :  \c" && read makeClean
-	if [[ "$makeClean" == 0 || "$makeClean" == 1 ]]; then
+	echo -e "Make clean before starting the build? : MAKE_CLEAN :  \c" && read MAKE_CLEAN
+	if [[ "$MAKE_CLEAN" == 0 || "$MAKE_CLEAN" == 1 ]]; then
 		echo -e ""
 	else
 	echo -e "ERROR! Wrong parameters passed. Reconfigure"
 	configureBuild
 	fi
 
-	echo -e "Make clobber before starting the build? : MakeClobber :  \c" && read makeClobber
-	if [[ $makeClobber == 0 || $makeClobber == 1 ]]; then
+	echo -e "Make clobber before starting the build? : MAKE_CLOBBER :  \c" && read MAKE_CLOBBER
+	if [[ $MAKE_CLOBBER == 0 || $MAKE_CLOBBER == 1 ]]; then
 		echo -e ""
 	else
 	echo -e "ERROR! Wrong parameters passed. Reconfigure"
 	configureBuild
 	fi
 
-	echo -e "Make InstallClean before starting the build? : MakeInstallClean :  \c" && read makeInstallClean
-	if [[ $makeInstallClean == 0 || $makeInstallClean == 1 ]]; then
+	echo -e "Make InstallClean before starting the build? : MAKE_INSTALLCLEAN :  \c" && read MAKE_INSTALLCLEAN
+	if [[ $MAKE_INSTALLCLEAN == 0 || $MAKE_INSTALLCLEAN == 1 ]]; then
 		echo -e ""
 	else
 	echo -e "ERROR! Wrong parameters passed. Reconfigure"
 	configureBuild
 	fi
 
-	echo -e "Repo sync before starting the build? : repoSyncBeforeBuild :  \c" && read repoSyncBeforeBuild
-	if [[ $repoSyncBeforeBuild == 0 || $repoSyncBeforeBuild == 1 ]]; then
-		if (test $repoSyncBeforeBuild = "1"); then 
-			if [[ $shellInTargetDir -eq 1 ]]; then
+	echo -e "Repo sync before starting the build? : REPO_SYNC_BEFORE_BUILD :  \c" && read REPO_SYNC_BEFORE_BUILD
+	if [[ $REPO_SYNC_BEFORE_BUILD == 0 || $REPO_SYNC_BEFORE_BUILD == 1 ]]; then
+		if (test $REPO_SYNC_BEFORE_BUILD = "1"); then 
+			if [[ $SHELL_IN_TARGET_DIR -eq 1 ]]; then
 				cd .repo/local_manifests 
 				if [ -f "roomservice.xml" ]; then
 				rm -f roomservice.xml
@@ -212,11 +208,11 @@ function configureBuild() {
 	fi
 	
 	if (test $device = "generic"); then 
-	echo -e "Skipping cherrypick parameter because the target device is generic" 	
+	echo -e "Skipping CHERRYPICK parameter because the target device is generic" 	
 	else 	
 		if [ -f "cherry_$device.sh" ]; then 
-		echo -e "Use cherry-pick script before starting the build for the $device device? : cherrypick :  \c" && read cherrypick
-			if [[ $cherrypick == 0 || $cherrypick == 1 ]]; then
+		echo -e "Use cherry-pick script before starting the build for the $device device? : CHERRYPICK :  \c" && read CHERRYPICK
+			if [[ $CHERRYPICK == 0 || $CHERRYPICK == 1 ]]; then
 			echo -e ""
 			else
 			echo -e " ERROR! Wrong parameters passed. Reconfigure"
@@ -235,10 +231,10 @@ function DeviceTarget() {
 	tput sgr0
 	tput setaf 4
 	echo -e "Checking if the build environment is initialized.."
-	if (test $buildEnvSetup = "1"); then
+	if (test $BUILD_ENV_SETUP = "1"); then
 	echo -e "Build environment already initialized skipping..."
 	else 
-	buildEnvSetup=1
+	BUILD_ENV_SETUP=1
 	source build/./envsetup.sh
 	fi
 	clear
@@ -316,7 +312,7 @@ function DeviceTarget() {
 }
 	
 
-function cherrypick() {
+function CHERRYPICK() {
 	
 	clear
 	tput setaf bold
@@ -363,14 +359,14 @@ function defconfig {
 	tput setaf 1
 
 	#Option values
-	makeClean=1
-	makeClobber=0
-	makeInstallClean=0
-	repoSyncBeforeBuild=1
+	MAKE_CLEAN=1
+	MAKE_CLOBBER=0
+	MAKE_INSTALLCLEAN=0
+	REPO_SYNC_BEFORE_BUILD=1
 	makeApp=0
-	buildEnvSetup=0
-	cherrypick=0
-	shellInTargetDir=0
+	BUILD_ENV_SETUP=0
+	CHERRYPICK=0
+	SHELL_IN_TARGET_DIR=0
 
 	#Restore Green
 	tput sgr0
