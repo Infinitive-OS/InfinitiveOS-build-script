@@ -234,6 +234,7 @@ function CONFIGURE_BUILD_OPTIONS() {
 	CONFIGURE_BUILD_OPTIONS
 	fi
 
+	export_DEFCONFIG
 }
 
 function DEFCONFIG {
