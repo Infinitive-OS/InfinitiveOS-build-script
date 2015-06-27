@@ -27,24 +27,34 @@ normal='tput sgr0'
 function IO_MAINSPLASH () {
 	tput bold
 	tput setaf 2 
-	echo -e "   .___        _____.__       .__  __  .__             ________    _________"
-	echo -e "   |   | _____/ ____\__| ____ |__|/  |_|__|__  __ ____ \_____  \  /   _____/"
-	echo -e "   |   |/    \   __\|  |/    \|  \   __\  \  \/ // __ \ /   |   \ \_____  \ "
-	echo -e "   |   |   |  \  |  |  |   |  \  ||  | |  |\   /\  ___//    |    \/        \ "
-	echo -e "   |___|___|  /__|  |__|___|  /__||__| |__| \_/  \___  >_______  /_______  /"
-	echo -e "           \/              \/                       \/        \/          \/"
-	echo -e "                                                             Mode:  $mode "
+	echo " "
+	echo " "
+	echo "				        #                     #         "
+	echo "				         #                  ##          "
+	echo "	I			          ###################           "
+	echo "	N			        #######################         "
+	echo "	F			      ###########################       "
+	echo "	I			    ###############################     "
+	echo "	N			   #################################    "
+	echo "	I			  ##################################i   "
+	echo "	T			  #######################      ######   "
+	echo "	E			 #####f     ###########         ;####   "
+	echo "				 #####        ########           #####  "
+	echo "	O			 ####E         ######            #####  "
+	echo "	S			 #####       #########           #####  "
+	echo "				  #####     ###########         #####   "
+	echo "				  ###############  ######      ######   "
+	echo "				   ############     ################    "
+	echo "				      ######          ############      "
+	echo "				                        i#######        "
 	tput sgr0
 	tput setaf 2
 }
 
 function CURRENT_CONFIG () {
-	echo -e " "
-	echo -e "  NOTE : We are using Binary inputs"
-	echo -e "  1 for Yes "
-	echo -e "  0 for No "
 	tput bold 
 	tput setaf 6
+	echo -e "   Mode:  $mode "
 	echo -e "============================================================"
 	echo -e " SHELL_IN_TARGET_DIR = $SHELL_IN_TARGET_DIR"
 	echo -e ""
@@ -262,22 +272,15 @@ function DEFCONFIG {
 
 	mode=Default
 
-	tput sgr0
-	tput setaf 1
-
 	#Option values
-	MAKE_CLEAN=1
-	MAKE_CLOBBER=0
-	MAKE_INSTALLCLEAN=0
-	REPO_SYNC_BEFORE_BUILD=1
-	makeApp=0
-	BUILD_ENV_SETUP=0
-	CHERRYPICK=0
-	SHELL_IN_TARGET_DIR=0
+	export MAKE_CLEAN=1
+	export MAKE_CLOBBER=0
+	export MAKE_INSTALLCLEAN=0
+	export REPO_SYNC_BEFORE_BUILD=1
+	export BUILD_ENV_SETUP=0
+	export CHERRYPICK=0
+	export SHELL_IN_TARGET_DIR=0
 
-	#Restore Green
-	tput sgr0
-	tput setaf 2
 	return
 }
 
@@ -305,11 +308,18 @@ function restore_IOConfig {
 	fi
 }
 
+IO_MAINSPLASH
+
 #Load default configurations
 DEFCONFIG
+echo -e " "
+echo -e "  NOTE : We are using Binary inputs"
+echo -e "  1 for Yes "
+echo -e "  0 for No "
+sleep 3
+clear
 
 while [[ true ]]; do
-	IO_MAINSPLASH
 	displayMainMenu
 done
 
