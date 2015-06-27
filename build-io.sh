@@ -164,28 +164,26 @@ function REPO_SYNC {
  	read INIT_AND_SYNC
  	echo "$INIT_AND_SYNC"
 
-	if [[ $SHELL_IN_TARGET_DIR -ne 1 ]]; then
-	 	if [[ $INIT_AND_SYNC -eq 1 ]]; then
-	 		echo "Beginning to initialize and Sync InfinitiveOS...."
-	 		echo " This may take a while.."
-	 		mkdir ./InfinitiveOS
-	 		cd ./InfinitiveOS
-	 		repo init -u https://github.com/InfinitiveOS/platform_manifest -b io-1.0
- 			echo -e "Does your device has a local_manifest?"
- 			echo -e "1 for Yes, and 0 for no : \c"	 		
-	 		read $HAS_LOCAL_MANIFEST
-	 		if [[ $HAS_LOCAL_MANIFEST -eq 1 ]]; then
-	 			mkdir .repo/local_manifest
-	 			echo "Paste your local manifest in the file that will now open"
-	 			echo "After pasting, press ctrl+o followed by ctrl+x , to save and exit the file."
-	 			echo "Make sure you have all your Remotes and revisions set according else sync might fail. ; \c"
-	 			echo "Press any key to continue : \c"
-	 			read blank
-	 			nano .repo/local_manifest/local.xml
-	 		fi
-	 		repo sync
+ 	if [[ $INIT_AND_SYNC -eq 1 ]]; then
+ 		echo "Beginning to initialize and Sync InfinitiveOS...."
+ 		echo " This may take a while.."
+ 		mkdir ./InfinitiveOS
+ 		cd ./InfinitiveOS
+ 		repo init -u https://github.com/InfinitiveOS/platform_manifest -b io-1.0
+			echo -e "Does your device has a local_manifest?"
+			echo -e "1 for Yes, and 0 for no : \c"	 		
+ 		read $HAS_LOCAL_MANIFEST
+ 		if [[ $HAS_LOCAL_MANIFEST -eq 1 ]]; then
+ 			mkdir .repo/local_manifest
+ 			echo "Paste your local manifest in the file that will now open"
+ 			echo "After pasting, press ctrl+o followed by ctrl+x , to save and exit the file."
+ 			echo "Make sure you have all your Remotes and revisions set according else sync might fail. ; \c"
+ 			echo "Press any key to continue : \c"
+ 			read blank
+ 			nano .repo/local_manifest/local.xml
  		fi
-	fi
+ 		repo sync
+		fi
 }
 
 function CONFIGURE_BUILD_OPTIONS() {
@@ -253,7 +251,6 @@ function DEFCONFIG {
 	export REPO_SYNC_BEFORE_BUILD=1
 	export BUILD_ENV_SETUP=0
 	export CHERRYPICK=0
-	export SHELL_IN_TARGET_DIR=0
 
 	#Restore Green
 	tput sgr0
@@ -266,7 +263,7 @@ function export_DEFCONFIG {
 	echo -e " "
 	echo -e "  Writing current configuration to io.config..."
 	FIRST=1
-	vars=(MAKE_CLEAN MAKE_CLOBBER MAKE_INSTALLCLEAN REPO_SYNC_BEFORE_BUILD BUILD_ENV_SETUP CHERRYPICK SHELL_IN_TARGET_DIR)
+	vars=(MAKE_CLEAN MAKE_CLOBBER MAKE_INSTALLCLEAN REPO_SYNC_BEFORE_BUILD BUILD_ENV_SETUP CHERRYPICK )
 	for i in ${vars[@]}; do
 		if [[ $FIRST -eq 1 ]]; then
 			echo ${i}=$[$i] > io.config
@@ -279,7 +276,7 @@ function export_DEFCONFIG {
 
 function restore_IOConfig {
 	if [[ -f "./io.config" ]]; then
-		vars=(MAKE_CLEAN MAKE_CLOBBER MAKE_INSTALLCLEAN REPO_SYNC_BEFORE_BUILD BUILD_ENV_SETUP CHERRYPICK SHELL_IN_TARGET_DIR)
+		vars=(MAKE_CLEAN MAKE_CLOBBER MAKE_INSTALLCLEAN REPO_SYNC_BEFORE_BUILD BUILD_ENV_SETUP CHERRYPICK)
 		for i in ${vars[@]}; do
 			while IFS='' read -r line || [[ -n $line ]]; do
 				export ${i}=`grep "${i}" "io.config" | cut -d'=' -f2`
