@@ -56,8 +56,6 @@ function CURRENT_CONFIG () {
 	tput setaf 6
 	echo -e "   Mode:  $mode "
 	echo -e "============================================================"
-	echo -e " SHELL_IN_TARGET_DIR = $SHELL_IN_TARGET_DIR"
-	echo -e ""
 	echo -e " BUILD_ENV_SETUP = $BUILD_ENV_SETUP"
 	echo -e ""
 	echo -e " MAKE_CLEAN = $MAKE_CLEAN"
@@ -80,31 +78,16 @@ function CURRENT_CONFIG () {
 
 function displayMainMenu() {
 	if [[ -n $TARGET_PRODUCT ]]; then
-		echo -e "  *************************************"
 		echo -e "	  TARGET_PRODUCT: $TARGET_PRODUCT   "
-		echo -e "  *************************************"
 	fi
-	CURRENT_CONFIG
-	echo  "  0. TARGET_PRODUCT   :  Enter the TARGET_DEVICE's codename"
-	echo  ""
-	echo  "  1. Setup android Build environment & Initialize and Sync InfinitiveOS "
-	echo  ""
-	echo  "  2. Update configurations  :  Configure Build parameters"
-	echo  ""
-	echo  "  	 2a. Reset All configurations"
-	echo  ""
-	if [[ $SHELL_IN_TARGET_DIR -eq 1 ]]; then
-		echo -e "  3. Set-up $TARGET_PRODUCT"
-		echo -e "  4. Build InfinitiveOS for $device"
-	fi
+	echo -e ""
+	echo -e "  1. Setup android Build environment & Initialize and Sync InfinitiveOS "
+	echo -e "  2. Update configurations, Configure Build parameters"
+	echo -e "  	 2a. Reset All configurations"
+	echo -e "  3. Set-up $TARGET_PRODUCT"
+	echo -e "  4. Build InfinitiveOS for $TARGET_PRODUCT"
 	echo -e "  6. Exit"
 	echo -e ""
-	if [[ $SHELL_IN_TARGET_DIR -eq 0 ]]; then
-		echo -e " NOTE:  SHELL_IN_TARGET_DIR is set to False. "
-		echo -e " 	if the shell is in same directory as the InfinitiveOS ROM sources. Press 12"
-		echo -e " 	Else press 1 to sync InfinitiveOS ROM sources"
-		echo -e ""
-	fi
 	echo -e "  Enter choice : \c"
 	read mainMenuChoice
 	PROCESS_MENU $mainMenuChoice
@@ -116,12 +99,11 @@ function PROCESS_MENU() {
 		1) REPO_SYNC ;;
 		2) CONFIGURE_BUILD_OPTIONS ;;
 		2a) DEFCONFIG ;;
-		3) SETUP_BUILD ;;
-		4) BUILD ;;
+		3)  ;;
+		4)  ;;
 		5) export_DEFCONFIG ;;
 		7) restore_IOConfig ;;
 		6) exit ;;
-		12) export SHELL_IN_TARGET_DIR=1 ;;
 		*) echo "  Invalid Option! ERROR!" ;;
 	esac
 	echo -e " Press any key to continue..."
@@ -197,6 +179,7 @@ function REPO_SYNC {
 	 			echo "Paste your local manifest in the file that will now open"
 	 			echo "After pasting, press ctrl+o followed by ctrl+x , to save and exit the file."
 	 			echo "Make sure you have all your Remotes and revisions set according else sync might fail. ; \c"
+	 			echo "Press any key to continue : \c"
 	 			read blank
 	 			nano .repo/local_manifest/local.xml
 	 		fi
@@ -245,17 +228,7 @@ function CONFIGURE_BUILD_OPTIONS() {
 
 	echo -e "Repo sync before starting the build? : REPO_SYNC_BEFORE_BUILD :  \c" && read REPO_SYNC_BEFORE_BUILD
 	if [[ $REPO_SYNC_BEFORE_BUILD == 0 || $REPO_SYNC_BEFORE_BUILD == 1 ]]; then
-		if (test $REPO_SYNC_BEFORE_BUILD = "1"); then 
-			if [[ $SHELL_IN_TARGET_DIR -eq 1 ]]; then
-				cd .repo/local_manifests 
-				if [ -f "roomservice.xml" ]; then
-				rm -f roomservice.xml
-				fi
-				cd ..
-				cd ..
-			fi
 		echo -e ""
-		fi
 	else
 	echo -e "ERROR! Wrong parameters passed. Reconfigure"
 	CONFIGURE_BUILD_OPTIONS
@@ -281,10 +254,16 @@ function DEFCONFIG {
 	export CHERRYPICK=0
 	export SHELL_IN_TARGET_DIR=0
 
+	#Restore Green
+	tput sgr0
+	tput setaf 2
+
 	return
 }
 
 function export_DEFCONFIG {
+	echo -e " "
+	echo -e "  Writing current configuration to io.config..."
 	FIRST=1
 	vars=(MAKE_CLEAN MAKE_CLOBBER MAKE_INSTALLCLEAN REPO_SYNC_BEFORE_BUILD BUILD_ENV_SETUP CHERRYPICK SHELL_IN_TARGET_DIR)
 	for i in ${vars[@]}; do
@@ -316,7 +295,10 @@ echo -e " "
 echo -e "  NOTE : We are using Binary inputs"
 echo -e "  1 for Yes "
 echo -e "  0 for No "
-sleep 3
+
+export_DEFCONFIG
+
+sleep 2
 clear
 
 while [[ true ]]; do
