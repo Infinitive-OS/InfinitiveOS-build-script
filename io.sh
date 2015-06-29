@@ -5,9 +5,6 @@
 echo -e '\0033\0143'
 clear
 
-# ALL HAIL GREEN
-tput setaf 2 
-
 # Our Rainbow
 red='tput setaf 1'              # red
 green='tput setaf 2'            # green
@@ -23,6 +20,8 @@ bldblu=${txtbld}$(tput setaf 4) # Bold blue
 bldcya=${txtbld}$(tput setaf 6) # Bold cyan
 normal='tput sgr0'
 
+# ALL HAIL GREEN
+tput setaf 2 
 
 function IO_MAINSPLASH () {
 	tput bold
@@ -54,39 +53,35 @@ function IO_MAINSPLASH () {
 function CURRENT_CONFIG () {
 	tput bold 
 	tput setaf 6
-	echo -e "   Mode:  $mode "
 	echo -e "============================================================"
 	echo -e " BUILD_ENV_SETUP = $BUILD_ENV_SETUP"
 	echo -e ""
 	echo -e " MAKE_CLEAN = $MAKE_CLEAN"
 	echo -e " MAKE_CLOBBER = $MAKE_CLOBBER"
-	echo -e " MAKE_INSTALLCLEAN = $MAKE_INSTALLCLEAN"
+	echo -e " RESET_HARD = $RESET_HARD"
 	echo -e " REPO_SYNC_BEFORE_BUILD = $REPO_SYNC_BEFORE_BUILD"
 	echo -e ""
 	echo -e " CHERRYPICK = $CHERRYPICK"
+	echo -e " EXPORT_PACKAGE = $EXPORT_PACKAGE"
 	echo -e "============================================================"
 	tput sgr0
 	tput setaf 2
-	if [[ $MAKE_CLEAN != "1" || $MAKE_CLOBBER != "0" || $MAKE_INSTALLCLEAN != "0"  || $REPO_SYNC_BEFORE_BUILD != "1" || $BUILD_ENV_SETUP != "0" || $CHERRYPICK != "0" ]]; then
-		echo -e "  DEFCONFIG changed."
-		echo -e "  Switched to custom mode. \n"
-		mode=Default
-	else			
-		mode=Custom
-	fi
 }
 
 function displayMainMenu() {
-	if [[ -n $TARGET_PRODUCT ]]; then
-		echo -e "	  TARGET_PRODUCT: $TARGET_PRODUCT   "
+	echo -e ""
+	if [[ -n $PRODUCT ]]; then
+		echo -e "	  PRODUCT: $PRODUCT   "
 	fi
 	echo -e ""
+	echo -e "  0. Enter Target product"
 	echo -e "  1. Setup android Build environment & Initialize and Sync InfinitiveOS "
 	echo -e "  2. Update configurations, Configure Build parameters"
 	echo -e "  	 2a. Reset All configurations"
-	echo -e "  3. Set-up $TARGET_PRODUCT"
-	echo -e "  4. Build InfinitiveOS for $TARGET_PRODUCT"
-	echo -e "  6. Exit"
+	echo -e "  3a. Export current config"
+	echo -e "  3b. Restore current config"
+	echo -e "  4. Build InfinitiveOS $PRODUCT"
+	echo -e "  99. Exit"
 	echo -e ""
 	echo -e "  Enter choice : \c"
 	read mainMenuChoice
@@ -95,15 +90,17 @@ function displayMainMenu() {
 
 function PROCESS_MENU() {
 	case $mainMenuChoice in
-		0) echo "Enter TARGET_PRODUCT " && read TARGET_PRODUCT ;;
+		0) echo "Enter PRODUCT " && read PRODUCT ;;
 		1) REPO_SYNC ;;
 		2) CONFIGURE_BUILD_OPTIONS ;;
 		2a) DEFCONFIG ;;
-		3)  ;;
-		4)  ;;
-		5) export_DEFCONFIG ;;
-		7) restore_IOConfig ;;
-		6) exit ;;
+		3a) export_DEFCONFIG ;;
+		3b) restore_IOConfig ;;
+		4) export_DEFCONFIG
+		   CURRENT_CONFIG
+		   sleep 3
+		   ./rom-build.sh $PRODUCT ;;
+		99) exit ;;
 		*) echo "  Invalid Option! ERROR!" ;;
 	esac
 	echo -e " Press any key to continue..."
@@ -112,20 +109,6 @@ function PROCESS_MENU() {
 }
 
 function REPO_SYNC {
-	PACKAGES=(git gnupg ccache lzop libglapi-mesa-lts-utopic:i386 libgl1-mesa-dri-lts-utopic:i386 flex bison gperf build-essential zip curl zlib1g-dev zlib1g-dev:i386 libc6-dev lib32bz2-1.0 lib32ncurses5-dev x11proto-core-dev libx11-dev:i386 libreadline6-dev:i386 lib32z1-dev libgl1-mesa-glx-lts-utopic:i386 libgl1-mesa-dev-lts-utopic g++-multilib mingw32 tofrodos python-markdown libxml2-utils xsltproc libreadline6-dev lib32readline-gplv2-dev libncurses5-dev bzip2 libbz2-dev libbz2-1.0 libghc-bzlib-dev lib32bz2-dev squashfs-tools pngcrush schedtool dpkg-dev)
- 	echo -e " Checking for required packages for building InfinitiveOS..."
-	sleep 1.5
-	for program in ${PACKAGES[@]} ; do
-	 	program_status=`which $program`
- 		if [[ -n $program_status ]]; then
- 			echo "$program_status is NOT installed"
-			sudo apt-get install $program 
-		else
-			echo -e "$program is installed"
- 		fi
- 	done
-
- 	sleep 1
 
  	echo -e ""
  	echo -e "Checking for java version"
@@ -156,23 +139,38 @@ function REPO_SYNC {
 		echo -e "Please enter your name for Git config : \c"
 		read uname
 		git config --global user.name "$uname"
+		PACKAGES=(git gnupg ccache lzop libglapi-mesa-lts-utopic:i386 libgl1-mesa-dri-lts-utopic:i386 flex bison gperf build-essential zip curl zlib1g-dev zlib1g-dev:i386 libc6-dev lib32bz2-1.0 lib32ncurses5-dev x11proto-core-dev libx11-dev:i386 libreadline6-dev:i386 lib32z1-dev libgl1-mesa-glx-lts-utopic:i386 libgl1-mesa-dev-lts-utopic g++-multilib mingw32 tofrodos python-markdown libxml2-utils xsltproc libreadline6-dev lib32readline-gplv2-dev libncurses5-dev bzip2 libbz2-dev libbz2-1.0 libghc-bzlib-dev lib32bz2-dev squashfs-tools pngcrush schedtool dpkg-dev)
+	 	echo -e " Checking for required packages for building InfinitiveOS..."
+		sleep 1.5
+		for program in ${PACKAGES[@]} ; do
+		 	program_status=`which $program`
+	 		if [[ -n $program_status ]]; then
+	 			echo "$program_status is NOT installed"
+				sudo apt-get install $program 
+			else
+				echo -e "$program is installed"
+	 		fi
+	 	done
  	fi
 
- 	echo -e "Do you want to initialize and sync InfinitiveOS?"
- 	echo -e "		This involes, init-ing the repo and syncing all from scratch. This might take a large amount of bandwidth."
+ 	echo -e "Do you want to initialize the repo?"
  	echo -e "1 for Yes, and 0 for no : \c"
- 	read INIT_AND_SYNC
- 	echo "$INIT_AND_SYNC"
+ 	read INIT
 
- 	if [[ $INIT_AND_SYNC -eq 1 ]]; then
+ 	echo -e "Do you want to sync InfinitiveOS?"
+ 	echo -e "1 for Yes, and 0 for no : \c"
+ 	read SYNC
+
+ 	if [[ $INIT -eq 1 ]]; then
  		echo "Beginning to initialize and Sync InfinitiveOS...."
  		echo " This may take a while.."
- 		mkdir ./InfinitiveOS
- 		cd ./InfinitiveOS
  		repo init -u https://github.com/InfinitiveOS/platform_manifest -b io-1.0
-			echo -e "Does your device has a local_manifest?"
-			echo -e "1 for Yes, and 0 for no : \c"	 		
- 		read $HAS_LOCAL_MANIFEST
+ 	fi
+
+	if [[ $SYNC -eq 1 ]]; then
+		echo -e "Does your device has a local_manifest?"
+		echo -e "1 for Yes, and 0 for no : \c"	 		
+		read $HAS_LOCAL_MANIFEST
  		if [[ $HAS_LOCAL_MANIFEST -eq 1 ]]; then
  			mkdir .repo/local_manifest
  			echo "Paste your local manifest in the file that will now open"
@@ -182,8 +180,12 @@ function REPO_SYNC {
  			read blank
  			nano .repo/local_manifest/local.xml
  		fi
+ 		if [[ -n $LAST_SYNC ]]; then
+ 			echo -e " Repo was last synced:"$LAST_SYNC
+ 		fi
  		repo sync
-		fi
+ 		LAST_SYNC=`date +"%Y-%m-%d_%H-%M-%S`
+ 	fi
 }
 
 function CONFIGURE_BUILD_OPTIONS() {
@@ -232,6 +234,22 @@ function CONFIGURE_BUILD_OPTIONS() {
 	CONFIGURE_BUILD_OPTIONS
 	fi
 
+	echo -e "repo forall -vc "git reset --hard" before syncing : RESET_HARD \c" && read REPO_SYNC_BEFORE_BUILD
+	if [[ $RESET_HARD == 0 || $RESET_HARD == 1 ]]; then
+		echo -e ""
+	else
+	echo -e "ERROR! Wrong parameters passed. Reconfigure"
+	CONFIGURE_BUILD_OPTIONS
+	fi
+
+	echo -e "Export package after build completes? :EXPORT_PACKAGE  \c" && read REPO_SYNC_BEFORE_BUILD
+	if [[ $EXPORT_PACKAGE == 0 || $EXPORT_PACKAGE == 1 ]]; then
+		echo -e ""
+	else
+	echo -e "ERROR! Wrong parameters passed. Reconfigure"
+	CONFIGURE_BUILD_OPTIONS
+	fi
+
 	export_DEFCONFIG
 }
 
@@ -251,10 +269,14 @@ function DEFCONFIG {
 	export REPO_SYNC_BEFORE_BUILD=1
 	export BUILD_ENV_SETUP=0
 	export CHERRYPICK=0
+	export EXPORT_PACKAGE=1
+	export RESET_HARD=0
 
 	#Restore Green
 	tput sgr0
 	tput setaf 2
+
+	export_DEFCONFIG
 
 	return
 }
@@ -263,7 +285,7 @@ function export_DEFCONFIG {
 	echo -e " "
 	echo -e "  Writing current configuration to io.config..."
 	FIRST=1
-	vars=(MAKE_CLEAN MAKE_CLOBBER MAKE_INSTALLCLEAN REPO_SYNC_BEFORE_BUILD BUILD_ENV_SETUP CHERRYPICK )
+	vars=(MAKE_CLEAN MAKE_CLOBBER REPO_SYNC_BEFORE_BUILD BUILD_ENV_SETUP CHERRYPICK EXPORT_PACKAGE RESET_HARD LAST_SYNC)
 	for i in ${vars[@]}; do
 		if [[ $FIRST -eq 1 ]]; then
 			echo ${i}=$[$i] > io.config
@@ -276,7 +298,7 @@ function export_DEFCONFIG {
 
 function restore_IOConfig {
 	if [[ -f "./io.config" ]]; then
-		vars=(MAKE_CLEAN MAKE_CLOBBER MAKE_INSTALLCLEAN REPO_SYNC_BEFORE_BUILD BUILD_ENV_SETUP CHERRYPICK)
+		vars=(MAKE_CLEAN MAKE_CLOBBER REPO_SYNC_BEFORE_BUILD BUILD_ENV_SETUP CHERRYPICK EXPORT_PACKAGE RESET_HARD LAST_SYNC)
 		for i in ${vars[@]}; do
 			while IFS='' read -r line || [[ -n $line ]]; do
 				export ${i}=`grep "${i}" "io.config" | cut -d'=' -f2`
@@ -304,4 +326,3 @@ while [[ true ]]; do
 done
 
 $normal
-
