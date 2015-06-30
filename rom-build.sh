@@ -88,6 +88,7 @@ if [[ -n $PRODUCT ]]; then
 		PACKAGE=`ls *.zip | grep 'InfinitiveOS'`
 		echo "Copying "$PACKAGE" to "$dir"/"$PACKAGE
 		cp $PACKAGE $dir/$PACKAGE	
+		cd $dir
 	fi
 
 	#Branding
